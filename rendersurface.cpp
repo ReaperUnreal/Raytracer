@@ -42,19 +42,3 @@ void RenderSurface::ToIntSurface(int *iSurface) const
 		(*iSurface) = (iter->ClampNormal()).ToInt();
 	}
 }
-
-void RenderSurface::ToSDLSurface(SDL_Surface *sSurface) const
-{
-	int sWidth = sSurface->pitch/4;
-	unsigned int *pixels = (unsigned int *)sSurface->pixels;
-	Color *iter = surface;
-	int i, j;
-
-	for(i = 0; i < height; i++, pixels += sWidth)
-	{
-		for(j = 0; j < width; j++, iter++)
-		{
-			*(pixels + j) = (iter->ClampNormal()).ToInt();
-		}
-	}
-}
