@@ -17,6 +17,7 @@
    #include <sys/time.h>
    #include <unistd.h>
 #endif
+#include "EasyBMP.h"
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;

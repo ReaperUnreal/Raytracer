@@ -31,6 +31,7 @@ public:
 	Color ClampLower(float f);
 	Color ClampNormal(void);
 	int ToInt(void);
+   RGBApixel ToRGBAPixel(void);
 
 	//static memory
 	static const Color white;

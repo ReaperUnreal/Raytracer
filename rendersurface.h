@@ -18,6 +18,7 @@ public:
 	//graphics methods
 	void PlotPixel(const Color &c, const int x, const int y);
 	void ToIntSurface(int *iSurface) const;
+   void ToBMP(BMP &out) const;
 private:
 	Color *surface;
 	int width, height;

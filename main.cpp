@@ -112,6 +112,13 @@ void render()
 	raytracer->Render();
 }
 
+void outputImage(const char *filename = "out.bmp")
+{
+   BMP out;
+   target->ToBMP(out);
+   out.WriteToFile(filename);
+}
+
 int main(int argc, char* argv[])
 {
    //setup the scene
@@ -134,6 +141,10 @@ int main(int argc, char* argv[])
 #else
    printf("Render Complete\n");
 #endif
+
+   //output the render result
+   printf("Writing Image\n");
+   outputImage();
 
 	//cleanup everything
    printf("Cleanup\n");

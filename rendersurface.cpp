@@ -42,3 +42,19 @@ void RenderSurface::ToIntSurface(int *iSurface) const
 		(*iSurface) = (iter->ClampNormal()).ToInt();
 	}
 }
+
+void RenderSurface::ToBMP(BMP &out) const
+{
+   //use EasyBMP to get all this output
+   out.SetSize(width, height);
+   out.SetBitDepth(24);
+
+   Color *iter = surface;
+   for(int j = 0; j < height; j++)
+   {
+      for(int i = 0; i < width; i++, iter++)
+      {
+         out.SetPixel(i, j, (iter->ClampNormal()).ToRGBAPixel());
+      }
+   }
+}
