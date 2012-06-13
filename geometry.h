@@ -146,6 +146,7 @@ public:
 	Vector GeneratePoint() const;
 private:
 	float PotentialFunction(Vector p1, Vector p2) const;
+
 	Sphere **balls;
 	int numBalls;
 	float threshold;
