@@ -121,22 +121,26 @@ void render()
 
 int main(int argc, char* argv[])
 {
-   //timing setup
-   struct timeval start, end;
-
    //setup the scene
    printf("Setup...\n");
 	setupScene();
 
    //render stuff
    printf("Begin Render\n");
+#ifdef __linux__
+   struct timeval start, end;
    gettimeofday(&start, NULL);
+#endif
    render();
+#ifdef __linux__
    gettimeofday(&end, NULL);
    long seconds = end.tv_sec - start.tv_sec;
    long useconds = end.tv_usec - start.tv_usec;
    long mtime = static_cast<long>((seconds * 1000 + useconds / 1000.0f) + 0.5f);
    printf("Render Complete, Time Taken: %ld ms\n", mtime);
+#else
+   printf("Render Complete\n");
+#endif
 
 	//cleanup everything
    printf("Cleanup\n");
