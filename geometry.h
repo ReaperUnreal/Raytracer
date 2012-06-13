@@ -97,15 +97,8 @@ public:
 	int Intersect(Ray &r, float &mindist) const;
 	Vector GeneratePoint() const;
 private:
-	union
-	{
-		struct
-		{
-			Vector normal;
-			float d;
-		};
-		float cell[4];
-	};
+   Vector normal;
+   float d;
 };
 
 //the Sphere class
