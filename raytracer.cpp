@@ -110,7 +110,8 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 	for(int i = 0; i < numItems; i++)
 	{
 		pg = sc->GetObjectAt(i);
-		if(res = pg->Intersect(r, dist))
+      res = pg->Intersect(r, dist);
+		if(res)
 		{
 			geom = pg;
 			result = res;
@@ -281,7 +282,8 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 				N = geom->GetNormal(intersection);
 				R = r.direction - N * (2.0f * N.Dot(r.direction));
 				samplePos = intersection + R * EPSILON;
-				Raytrace(Ray(samplePos, R), accumulator, depth + 1, rdist);
+            Ray reflectedRay(samplePos, R);
+				Raytrace(reflectedRay, accumulator, depth + 1, rdist);
 				for(int i = 1; i < reflectionBlur; i++)
 				{
 					float x = ((0.2f * lrflti(rand())) / RAND_MAX) - 0.1f;
@@ -289,7 +291,8 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 					float z = ((0.2f * lrflti(rand())) / RAND_MAX) - 0.1f;
 					sampleDir = R + Vector(x, y, z);
 					sampleDir.Normalize();
-					Raytrace(Ray(samplePos, sampleDir), reflection, depth + 1, rdist);
+               Ray sampleRay(samplePos, sampleDir);
+					Raytrace(sampleRay, reflection, depth + 1, rdist);
 					accumulator += reflection;
 				}
 				if(reflectionBlur > 1)
