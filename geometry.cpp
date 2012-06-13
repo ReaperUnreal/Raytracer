@@ -460,7 +460,7 @@ int Metaball::Intersect(Ray &r, float &mindist) const
 	Sphere bounds = GetBounds();
 	
 	//get both intersection points
-	float startVal, endVal;
+	float startVal = 0.0f, endVal = 0.0f;
 	int intersect = bounds.GetIntersectionPoints(r, startVal, endVal);
 	if(intersect == MISS)
 		return MISS;
