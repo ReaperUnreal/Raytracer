@@ -5,12 +5,6 @@ Scene *scene;
 Camera *cam;
 RenderSurface *target;
 
-inline void PutPixel(int x, int y, unsigned int c)
-{
-	((unsigned int *)screen->pixels)[x + y * (screen->pitch / 4)] = c;
-}
-
-
 void setupScene()
 {
 	raytracer = new Raytracer();
