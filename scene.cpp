@@ -90,7 +90,7 @@ void Scene::RemoveObject(Geometry *object)
 
 	//find the object and remove it
 	Geometry **iter1 = objects, **iter2 = NULL;
-	int i, j;
+   int i, j;
 	for(i = 0; i < numObjects; i++, iter1++)
 	{
 		//found the object
@@ -100,7 +100,7 @@ void Scene::RemoveObject(Geometry *object)
 			*iter1 = NULL;
 			iter2 = iter1;
 			iter1++;
-			for(j = 0; j < numObjects; j++, *iter1++)
+			for(j = 0; j < numObjects; j++, iter1++)
 			{
 				*iter2 = *iter1;
 				iter2 = iter1;
@@ -141,14 +141,14 @@ Geometry* Scene::RemoveObjectAt(int index)
 
 	//find the object and remove it
 	Geometry **iter1 = (objects + index), **iter2 = NULL, *retval = NULL;
-	int i;
 	retval = *iter1;
 	*iter1 = NULL;
 
 	//adjust the list
 	iter2 = iter1;
 	iter1++;
-	for(i = 0; i < numObjects; i++, *iter1++)
+   int i;
+	for(i = 0; i < numObjects; i++, iter1++)
 	{
 		*iter2 = *iter1;
 		iter2 = iter1;
