@@ -110,90 +110,35 @@ void cleanupScene()
 
 void render()
 {
-	//lock surface if needed
-	if(SDL_MUSTLOCK(screen))
-	{
-		if(SDL_LockSurface(screen) < 0)
-			return;
-	}
-
-	//ask SDL for the time in milliseconds
-	int ticks = SDL_GetTicks();
-	srand(ticks);
+   //seed random
+   struct timeval start;
+   gettimeofday(&start, NULL);
+	srand(start.tv_usec);
 
 	//raytrace the scene
 	raytracer->Render();
-	target->ToSDLSurface(screen);
-
-	//end timing
-	int millis = SDL_GetTicks() - ticks;
-	char title[128];
-	sprintf_s(title, "Done: %dms", millis);
-	SDL_WM_SetCaption(title, 0);
-
-	//unlock if needed
-	if(SDL_MUSTLOCK(screen))
-	{
-		SDL_UnlockSurface(screen);
-	}
-
-	//tell SDL to update the whole screen
-	SDL_UpdateRect(screen, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 int main(int argc, char* argv[])
 {
-	//initialize SDL's subsystems, in this case, only video
-	if(SDL_Init(SDL_INIT_VIDEO) < 0)
-	{
-		fprintf(stderr, "Unable to init SDL: %s\n", SDL_GetError());
-		exit(1);
-	}
+   //timing setup
+   struct timeval start, end;
 
-	//register SDL_Quit to be called at exit, makes sure things are cleaned up when we quit
-	atexit(SDL_Quit);
-
-	//attempt to create a 640x480 window with 32 bit pixels
-	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 32, SDL_SWSURFACE);
-
-	//if we fail, return error
-	if(screen == NULL)
-	{
-		fprintf(stderr, "Unable to set 640x480 video: %s\n", SDL_GetError());
-		exit(1);
-	}
-
-	//set the window title
-	SDL_WM_SetCaption("Raytracing...", 0);
-
-	//setup the scene
+   //setup the scene
+   printf("Setup...\n");
 	setupScene();
 
-	//main loop, loop forever
-	while(1)
-	{
-		//render stuff
-		render();
-
-		//poll for events and handle the ones we care about
-		SDL_Event event;
-		while(SDL_PollEvent(&event))
-		{
-			switch(event.type)
-			{
-			case SDL_KEYDOWN:
-				break;
-			case SDL_KEYUP:
-				//if escape key is pressed return and thus quit
-				if(event.key.keysym.sym == SDLK_ESCAPE)
-					return 0;
-				break;
-			case SDL_QUIT:
-				return 0;
-			}
-		}
-	}
+   //render stuff
+   printf("Begin Render\n");
+   gettimeofday(&start, NULL);
+   render();
+   gettimeofday(&end, NULL);
+   long seconds = end.tv_sec - start.tv_sec;
+   long useconds = end.tv_usec - start.tv_usec;
+   long mtime = static_cast<long>((seconds * 1000 + useconds / 1000.0f) + 0.5f);
+   printf("Render Complete, Time Taken: %ld ms\n", mtime);
 
 	//cleanup everything
+   printf("Cleanup\n");
 	cleanupScene();
 }
