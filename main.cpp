@@ -1,6 +1,5 @@
 #include "main.h"
 
-SDL_Surface *screen;
 Raytracer *raytracer;
 Scene *scene;
 Camera *cam;
