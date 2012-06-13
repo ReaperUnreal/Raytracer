@@ -5,12 +5,17 @@
 #include <math.h>
 #include <memory.h>
 #include <string>
+#include <stdio.h>
 #ifdef OMP_ENABLE
    #include <omp.h>
 #endif
 #ifdef SSE2_ENABLE
    #include <xmmintrin.h>
    #include <intrin.h>
+#endif
+#ifdef __linux__
+   #include <sys/time.h>
+   #include <unistd.h>
 #endif
 
 const int SCREEN_WIDTH = 640;
@@ -29,7 +34,7 @@ inline bool FloatEquals(float a, float b)
 
 inline void BreakIf(bool condition)
 {
-#ifdef MSCV
+#ifndef __linux__
 	if(condition)
 	{
 		__asm
@@ -40,9 +45,9 @@ inline void BreakIf(bool condition)
 #endif
 }
 
+#ifndef __linux__
 inline int lrintf(float flt)
 {
-#ifdef MSVC
 	int intgr;
 	__asm
 	{
@@ -50,14 +55,12 @@ inline int lrintf(float flt)
 		fistp	intgr
 	}
 	return intgr;
-#else
-   return static_cast<int>(flt);
-#endif
 }
+#endif
 
+#ifndef __linux__
 inline float lrflti(int intgr)
 {
-#ifdef MSVC
 	float flt;
 	__asm
 	{
@@ -65,10 +68,8 @@ inline float lrflti(int intgr)
 		fstp	flt
 	}
 	return flt;
-#else
-   return static_cast<float>(intgr);
-#endif
 }
+#endif
 
 inline unsigned int CreateColor(int r, int g, int b)
 {
