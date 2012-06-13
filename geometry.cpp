@@ -90,7 +90,7 @@ float Material::GetIOR(void) const
 }
 
 //the Geometry class
-Geometry::Geometry(void) : isLight(false), lightIntensity(1.0f), name("Unknown"), mat()
+Geometry::Geometry(void) : mat(), name("Unknown"), isLight(false), lightIntensity(1.0f)
 {
 }
 
@@ -303,7 +303,6 @@ int Sphere::GetIntersectionPoints(Ray &r, float &d1, float &d2) const
 	Vector v = r.origin - position;
 	float b = -v.Dot(r.direction);
 	float det = (b * b) - v.Dot(v) + sqrRadius;
-	int retval = MISS;
 	if(det > 0)
 	{
 		det = sqrtf(det);
@@ -326,7 +325,7 @@ int Sphere::GetIntersectionPoints(Ray &r, float &d1, float &d2) const
 }
 
 //the Metaball class
-Metaball::Metaball(Sphere **ballList, int ballCount) : balls(ballList), numBalls(ballCount), stepVal(0.01f), threshold(1.0f)
+Metaball::Metaball(Sphere **ballList, int ballCount) : balls(ballList), numBalls(ballCount), threshold(1.0f), stepVal(0.01f)
 {
 }
 
