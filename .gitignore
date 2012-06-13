@@ -13,3 +13,9 @@
 
 # Output files
 *.bmp
+
+# Vim files
+.*.swp
+
+# The output executable
+rt
