@@ -426,7 +426,9 @@ void Raytracer::Render(void)
 	//render each line in parallel
 	int y, x, s;
 	float u, v;
-	#pragma omp parallel for default(none) shared(height, width, dy, dx, o, surface, topleft, offset, numSamples, divider) private(x, y, screenpos, pixel, dir, geom, s, accumulator, u, v) firstprivate(r, dist) schedule(dynamic, 1)
+#ifdef ENABLE_OMP
+   #pragma omp parallel for default(none) shared(height, width, dy, dx, o, surface, topleft, offset, numSamples, divider) private(x, y, screenpos, pixel, dir, geom, s, accumulator, u, v) firstprivate(r, dist) schedule(dynamic, 1)
+#endif
 	for(y = 0; y < height; y++)
 	{
 		screenpos = topleft + (dy * lrflti(y));
