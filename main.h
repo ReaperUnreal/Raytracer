@@ -58,9 +58,9 @@ inline int lrintf(float flt)
 }
 #endif
 
-#ifndef __linux__
 inline float lrflti(int intgr)
 {
+#ifndef __linux__
 	float flt;
 	__asm
 	{
@@ -68,8 +68,10 @@ inline float lrflti(int intgr)
 		fstp	flt
 	}
 	return flt;
-}
+#else
+   return static_cast<float>(intgr);
 #endif
+}
 
 inline unsigned int CreateColor(int r, int g, int b)
 {
