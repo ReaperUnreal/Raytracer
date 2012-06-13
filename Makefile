@@ -1,11 +1,12 @@
 CC=g++
-CFLAGS=-c -Wall
+CFLAGS=-c -Wall -fopenmp -DOMP_ENABLE
+LFLAGS=-fopenmp
 EXECUTABLE=rt
 
 all: $(EXECUTABLE)
 
 $(EXECUTABLE): camera.o color.o geometry.o main.o ray.o raytracer.o rendersurface.o scene.o vector.o
-	$(CC) camera.o color.o geometry.o main.o ray.o raytracer.o rendersurface.o scene.o vector.o -o $(EXECUTABLE)
+	$(CC) $(LFLAGS) camera.o color.o geometry.o main.o ray.o raytracer.o rendersurface.o scene.o vector.o -o $(EXECUTABLE)
 
 camera.o: camera.cpp
 	$(CC) $(CFLAGS) camera.cpp
