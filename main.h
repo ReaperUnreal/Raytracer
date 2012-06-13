@@ -5,10 +5,13 @@
 #include <math.h>
 #include <memory.h>
 #include <string>
-#include "SDL.h"
-#include <omp.h>
-#include <xmmintrin.h>
-#include <intrin.h>
+#ifdef OMP_ENABLE
+   #include <omp.h>
+#endif
+#ifdef SSE2_ENABLE
+   #include <xmmintrin.h>
+   #include <intrin.h>
+#endif
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -26,6 +29,7 @@ inline bool FloatEquals(float a, float b)
 
 inline void BreakIf(bool condition)
 {
+#ifdef MSCV
 	if(condition)
 	{
 		__asm
@@ -33,10 +37,12 @@ inline void BreakIf(bool condition)
 			int 3
 		}
 	}
+#endif
 }
 
 inline int lrintf(float flt)
 {
+#ifdef MSVC
 	int intgr;
 	__asm
 	{
@@ -44,10 +50,14 @@ inline int lrintf(float flt)
 		fistp	intgr
 	}
 	return intgr;
+#else
+   return static_cast<int>(flt);
+#endif
 }
 
 inline float lrflti(int intgr)
 {
+#ifdef MSVC
 	float flt;
 	__asm
 	{
@@ -55,6 +65,9 @@ inline float lrflti(int intgr)
 		fstp	flt
 	}
 	return flt;
+#else
+   return static_cast<float>(intgr);
+#endif
 }
 
 inline unsigned int CreateColor(int r, int g, int b)
@@ -63,17 +76,17 @@ inline unsigned int CreateColor(int r, int g, int b)
 }
 
 #ifdef SSE2_ENABLE
-	#include "Color_SSE.h"
-	#include "Vector_SSE.h"
+	#include "color_sse.h"
+	#include "vector_sse.h"
 #else
-	#include "Color.h"
-	#include "Vector.h"
+	#include "color.h"
+	#include "vector.h"
 #endif
-#include "RenderSurface.h"
-#include "Ray.h"
-#include "Camera.h"
-#include "Geometry.h"
-#include "Scene.h"
-#include "Raytracer.h"
+#include "rendersurface.h"
+#include "ray.h"
+#include "camera.h"
+#include "geometry.h"
+#include "scene.h"
+#include "raytracer.h"
 
 #endif
