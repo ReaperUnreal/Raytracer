@@ -3,7 +3,7 @@ CFLAGS=-c -Wall -fopenmp -DOMP_ENABLE
 LFLAGS=-fopenmp
 EXECUTABLE=rt
 
-all: CFLAGS+=-O3 -ffast-math
+all: CFLAGS+=-O3 -ffast-math -fprefetch-loop-arrays -funsafe-loop-optimizations -flto -fno-signed-zeros -fno-trapping-math -fassociative-math -freciprocal-math -march=core2 -mssse3 -mfpmath=sse -mrecip
 all: $(EXECUTABLE)
 
 debug: CFLAGS+=-g
