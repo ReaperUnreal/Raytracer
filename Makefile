@@ -3,7 +3,11 @@ CFLAGS=-c -Wall -fopenmp -DOMP_ENABLE
 LFLAGS=-fopenmp
 EXECUTABLE=rt
 
+all: CFLAGS+=-O3 -ffast-math
 all: $(EXECUTABLE)
+
+debug: CFLAGS+=-g
+debug: $(EXECUTABLE)
 
 $(EXECUTABLE): camera.o color.o geometry.o main.o ray.o raytracer.o rendersurface.o scene.o vector.o
 	$(CC) $(LFLAGS) camera.o color.o geometry.o main.o ray.o raytracer.o rendersurface.o scene.o vector.o -o $(EXECUTABLE)
