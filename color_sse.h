@@ -1,4 +1,3 @@
-#ifdef SSE2_ENABLE
 #ifndef COLOR_H
 #define COLOR_H
 
@@ -9,22 +8,28 @@ class Color
 public:
 	//constructor and destructor
 	Color(float red = 0.0f, float green = 0.0f, float blue = 0.0f);
-	Color(__m128 c);
+	Color(__m128 ic);
 	Color(float *a);
 	~Color(void);
 
+   //accessors
+   float r() const;
+   float g() const;
+   float b() const;
+   float a() const;
+
 	//operators
-	Color operator+(const Color &c) const;
-	Color operator-(const Color &c) const;
-	Color operator*(const Color &c) const;
-	Color operator/(const Color &c) const;
+	Color operator+(const Color &ic) const;
+	Color operator-(const Color &ic) const;
+	Color operator*(const Color &ic) const;
+	Color operator/(const Color &ic) const;
 	Color operator*(const float f) const;
 	Color operator/(const float f) const;
 	
-	void operator+=(const Color &c);
-	void operator-=(const Color &c);
-	void operator*=(const Color &c);
-	void operator/=(const Color &c);
+	void operator+=(const Color &ic);
+	void operator-=(const Color &ic);
+	void operator*=(const Color &ic);
+	void operator/=(const Color &ic);
 	void operator*=(const float f);
 	void operator/=(const float f);
 
@@ -48,13 +53,9 @@ public:
 	//memory
 	union
 	{
-		struct
-		{
-			float r, g, b, a;
-		};
+      __m128 c;
 		float array[4];
 	};
 };
 
-#endif
 #endif

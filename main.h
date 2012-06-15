@@ -92,8 +92,7 @@ typedef union vu
 #endif
 
 #ifdef SSE2_ENABLE
-	#include "color.h"
-	//#include "color_sse.h"
+   #include "color_sse.h"
    #include "vector_sse.h"
 #else
 	#include "color.h"

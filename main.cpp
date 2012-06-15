@@ -121,16 +121,19 @@ void outputImage(const char *filename = "out.bmp")
 
 void test()
 {
-   Vector v1(1.0f, 0.0f, 0.0f);
-   Vector v2(0.0f, 1.0f, 0.0f);
-   printf("(%0.1f, %0.1f, %0.1f)\n", v1.x(), v1.y(), v1.z());
-   printf("%#08x\n", &(v1.v));
-   printf("(%0.1f, %0.1f, %0.1f)\n", v2.x(), v2.y(), v2.z());
-   printf("%#08x\n", &(v2.v));
+   Color v1(1.0f, 2.0f, -0.5f);
+   Color v2(0.0f, 1.0f, 0.0f);
+   printf("(%0.1f, %0.1f, %0.1f)\n", v1.r(), v1.g(), v1.b());
+   printf("%#08x\n", &(v1.c));
+   printf("(%0.1f, %0.1f, %0.1f)\n", v2.r(), v2.g(), v2.b());
+   printf("%#08x\n", &(v2.c));
 
-   Vector x = Vector::Cross(v1, v2);
-   printf("(%0.1f, %0.1f, %0.1f)\n", x.x(), x.y(), x.z());
-   printf("%#08x\n", &(x.v));
+   Color x = v1 + v2;
+   printf("(%0.1f, %0.1f, %0.1f)\n", x.r(), x.g(), x.b());
+   printf("%#08x\n", &(x.c));
+
+   int c = x.ClampNormal().ToInt();
+   printf("%#08x\n", c);
 }
 
 int main(int argc, char* argv[])

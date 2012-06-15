@@ -10,14 +10,14 @@ all: $(EXECUTABLE)
 debug: CFLAGS+=-g
 debug: $(EXECUTABLE)
 
-$(EXECUTABLE): camera.o color.o EasyBMP.o geometry.o main.o ray.o raytracer.o rendersurface.o scene.o vector_sse.o
-	$(CC) $(LFLAGS) camera.o color.o EasyBMP.o geometry.o main.o ray.o raytracer.o rendersurface.o scene.o vector_sse.o -o $(EXECUTABLE)
+$(EXECUTABLE): camera.o color_sse.o EasyBMP.o geometry.o main.o ray.o raytracer.o rendersurface.o scene.o vector_sse.o
+	$(CC) $(LFLAGS) camera.o color_sse.o EasyBMP.o geometry.o main.o ray.o raytracer.o rendersurface.o scene.o vector_sse.o -o $(EXECUTABLE)
 
 camera.o: camera.cpp
 	$(CC) $(CFLAGS) camera.cpp
 
-color.o: color.cpp
-	$(CC) $(CFLAGS) color.cpp
+color_sse.o: color_sse.cpp
+	$(CC) $(CFLAGS) color_sse.cpp
 
 EasyBMP.o: EasyBMP.cpp
 	$(CC) $(EASY_BMP_CFLAGS) EasyBMP.cpp
