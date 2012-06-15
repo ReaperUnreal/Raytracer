@@ -163,6 +163,19 @@ int Color::ToInt(void)
 	return ((red << 16) + (green << 8) + blue);
 }
 
+RGBApixel Color::ToRGBAPixel(void)
+{
+   int red = lrintf(r * 255.0f);
+   int green = lrintf(g * 255.0f);
+   int blue = lrintf(b * 255.0f);
+   RGBApixel p;
+   p.Red = red;
+   p.Green = green;
+   p.Blue = blue;
+   p.Alpha = 255;
+   return p;
+}
+
 //static colors
 const Color Color::white =     Color(1.0f, 1.0f, 1.0f);
 const Color Color::black =     Color(0.0f, 0.0f, 0.0f);

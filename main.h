@@ -10,8 +10,12 @@
    #include <omp.h>
 #endif
 #ifdef SSE2_ENABLE
-   #include <xmmintrin.h>
-   #include <intrin.h>
+   #ifdef __linux__
+      #include <immintrin.h>
+   #else
+      #include <intrin.h>
+      #include <xmmintrin.h>
+   #endif
 #endif
 #ifdef __linux__
    #include <sys/time.h>
@@ -81,7 +85,7 @@ inline unsigned int CreateColor(int r, int g, int b)
 
 #ifdef SSE2_ENABLE
 	#include "color_sse.h"
-	#include "vector_sse.h"
+   #include "vector_sse.h"
 #else
 	#include "color.h"
 	#include "vector.h"

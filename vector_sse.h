@@ -1,4 +1,3 @@
-#ifdef SSE2_ENABLE
 #ifndef VECTOR_H
 #define VECTOR_H
 
@@ -50,5 +49,4 @@ public:
 	};
 };
 
-#endif
 #endif

@@ -1,4 +1,3 @@
-#ifdef SSE2_ENABLE
 #include "main.h"
 
 //constructor and destructor
@@ -197,4 +196,3 @@ void Vector::Normalize(Vector &v)
 {
 	v.Normalize();
 }
-#endif

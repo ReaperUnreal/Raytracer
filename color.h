@@ -1,4 +1,3 @@
-#ifndef SSE2_ENABLE
 #ifndef COLOR_H
 #define COLOR_H
 
@@ -47,5 +46,4 @@ public:
 	float r, g, b;
 };
 
-#endif
 #endif

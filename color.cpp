@@ -1,4 +1,3 @@
-#ifndef SSE2_ENABLE
 #include "main.h"
 
 //constructor and destructor
@@ -166,4 +165,3 @@ const Color Color::blue  =     Color(0.0f, 0.0f, 1.0f);
 const Color Color::yellow =    Color(1.0f, 1.0f, 0.0f);
 const Color Color::turquoise = Color(0.0f, 1.0f, 1.0f);
 const Color Color::purple =    Color(1.0f, 0.0f, 1.0f);
-#endif

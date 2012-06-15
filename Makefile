@@ -1,10 +1,10 @@
 CC=g++
-CFLAGS=-c -Wall -fopenmp -DOMP_ENABLE
+CFLAGS=-c -Wall -fopenmp -DOMP_ENABLE -DSSE2_ENABLE -march=core2 -mssse3 -mfpmath=sse
 LFLAGS=-fopenmp
 EXECUTABLE=rt
 EASY_BMP_CFLAGS=-c -fopenmp -O3 -march=core2 -mssse3 -mfpmath=sse -mrecip
 
-all: CFLAGS+=-O3 -ffast-math -fprefetch-loop-arrays -funsafe-loop-optimizations -fno-signed-zeros -fno-trapping-math -fassociative-math -freciprocal-math -march=core2 -mssse3 -mfpmath=sse -mrecip
+all: CFLAGS+=-O3 -ffast-math -fprefetch-loop-arrays -funsafe-loop-optimizations -fno-signed-zeros -fno-trapping-math -fassociative-math -freciprocal-math -mrecip
 all: $(EXECUTABLE)
 
 debug: CFLAGS+=-g
