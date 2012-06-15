@@ -510,3 +510,69 @@ Vector Metaball::GeneratePoint(void) const
 		return Vector();
 	}
 }
+
+
+//the Signed Distance Function class
+SDF::SDF() : threshold(0.01f), iterations(16)
+{
+}
+
+virtual SDF::~SDF()
+{
+}
+
+void SDF::SetThreshold(float val)
+{
+   threshold = val;
+}
+
+float SDF::GetThreshold() const
+{
+   return threshold;
+}
+
+void SDF::SetIterations(int i)
+{
+   iterations = i;
+}
+
+int SDF::GetIterations() const
+{
+   return iterations;
+}
+
+Vector SDF::GetNormal(Vector &pos) const
+{
+   return Vector(); //FIX ME
+}
+
+int SDF::Intersect(Ray &r, float &mindist) const
+{
+   Vector p = r.origin;
+   float d = distance(p);
+
+   for(int i = 0; i < iterations; i++)
+   {
+      if(d < threshold)
+      {
+         mindist = 
+      }
+      p = r.origin + (d * r.direction);
+   }
+}
+
+int SDF::GetType()
+{
+   return SDFUNC;
+}
+
+Vector SDF::GeneratePoint() const
+{
+   //TODO: This is going to be hard, maybe pick a random point and try to iterate up to 5 times or so, and if it doesn't come close, pick another point
+   // maybe up to 5 points?
+}
+
+float SDF::distance(Vector &pos) const
+{
+   return 0.0f; //always hit?
+}

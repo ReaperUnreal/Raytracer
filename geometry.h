@@ -51,7 +51,8 @@ public:
 		CYLINDER,
 		ELLIPSE,
 		QUADRIC,
-		METABALL
+		METABALL,
+      SDFUNC
 	};
 	Geometry(void);
 	virtual ~Geometry(void);
@@ -151,6 +152,30 @@ private:
 	int numBalls;
 	float threshold;
 	const float stepVal;
+};
+
+//try out some signed distance fields
+class SDF : public Geometry
+{
+public:
+   SDF();
+   virtual ~SDF();
+   
+   Vector GetNormal(Vector &pos) const;
+   int Intersect(Ray &r, float &mindist) const;
+   int GetType(void) const;
+   Vector GeneratePoint() const;
+
+   void SetThreshold(float val);
+   float GetThreshold() const;
+   void SetIterations(int i);
+   int GetIterations() const;
+protected:
+   float distance(Vector &p) const;
+
+private:
+   float threshold;
+   int iterations;
 };
 
 #endif
