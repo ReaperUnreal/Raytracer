@@ -119,8 +119,25 @@ void outputImage(const char *filename = "out.bmp")
    out.WriteToFile(filename);
 }
 
+void test()
+{
+   Vector v1(1.0f, 0.0f, 0.0f);
+   Vector v2(0.0f, 1.0f, 0.0f);
+   printf("(%0.1f, %0.1f, %0.1f)\n", v1.x(), v1.y(), v1.z());
+   printf("%#08x\n", &(v1.v));
+   printf("(%0.1f, %0.1f, %0.1f)\n", v2.x(), v2.y(), v2.z());
+   printf("%#08x\n", &(v2.v));
+
+   Vector x = Vector::Cross(v1, v2);
+   printf("(%0.1f, %0.1f, %0.1f)\n", x.x(), x.y(), x.z());
+   printf("%#08x\n", &(x.v));
+}
+
 int main(int argc, char* argv[])
 {
+   //test();
+   //return 0;
+
    //setup the scene
    printf("Setup...\n");
 	setupScene();
@@ -149,4 +166,6 @@ int main(int argc, char* argv[])
 	//cleanup everything
    printf("Cleanup\n");
 	cleanupScene();
+
+   return 0;
 }

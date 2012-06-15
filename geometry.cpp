@@ -199,7 +199,7 @@ Vector Plane::GeneratePoint() const
 {
 	float x = ((20.0f * lrflti(rand())) * MAX_RAND_DIVIDER) - 10.0f;
 	float y = ((20.0f * lrflti(rand())) * MAX_RAND_DIVIDER) - 10.0f;
-	float z = -((normal.x * x + normal.y * y + d) / normal.z);
+	float z = -((normal.x() * x + normal.y() * y + d) / normal.z());
 	return Vector(x, y, z);
 }
 
@@ -371,20 +371,26 @@ Sphere Metaball::GetBounds(void) const
 		for(int i = 1; i < numBalls; i++)
 		{
 			//mins
+         min = Vector::Min(balls[i]->GetPosition(), min);
+         /*
 			if(balls[i]->GetPosition().x < min.x)
 				min.x = balls[i]->GetPosition().x;
 			if(balls[i]->GetPosition().y < min.y)
 				min.y = balls[i]->GetPosition().y;
 			if(balls[i]->GetPosition().z < min.z)
 				min.z = balls[i]->GetPosition().z;
+         */
 
 			//max
+         max = Vector::Max(balls[i]->GetPosition(), max);
+         /*
 			if(balls[i]->GetPosition().x > max.x)
 				max.x = balls[i]->GetPosition().x;
 			if(balls[i]->GetPosition().y > max.y)
 				max.y = balls[i]->GetPosition().y;
 			if(balls[i]->GetPosition().z > max.z)
 				max.z = balls[i]->GetPosition().z;
+         */
 		}
 		Vector line = max - min;
 		float dist = line.Length();

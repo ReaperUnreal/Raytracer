@@ -84,7 +84,16 @@ inline unsigned int CreateColor(int r, int g, int b)
 }
 
 #ifdef SSE2_ENABLE
-	#include "color_sse.h"
+typedef union vu
+{
+   __m128 v;
+   float array[4];
+} vector_access;
+#endif
+
+#ifdef SSE2_ENABLE
+	#include "color.h"
+	//#include "color_sse.h"
    #include "vector_sse.h"
 #else
 	#include "color.h"

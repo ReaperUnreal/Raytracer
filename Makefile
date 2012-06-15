@@ -10,8 +10,8 @@ all: $(EXECUTABLE)
 debug: CFLAGS+=-g
 debug: $(EXECUTABLE)
 
-$(EXECUTABLE): camera.o color.o EasyBMP.o geometry.o main.o ray.o raytracer.o rendersurface.o scene.o vector.o
-	$(CC) $(LFLAGS) camera.o color.o EasyBMP.o geometry.o main.o ray.o raytracer.o rendersurface.o scene.o vector.o -o $(EXECUTABLE)
+$(EXECUTABLE): camera.o color.o EasyBMP.o geometry.o main.o ray.o raytracer.o rendersurface.o scene.o vector_sse.o
+	$(CC) $(LFLAGS) camera.o color.o EasyBMP.o geometry.o main.o ray.o raytracer.o rendersurface.o scene.o vector_sse.o -o $(EXECUTABLE)
 
 camera.o: camera.cpp
 	$(CC) $(CFLAGS) camera.cpp
@@ -40,8 +40,8 @@ rendersurface.o: rendersurface.cpp
 scene.o: scene.cpp
 	$(CC) $(CFLAGS) scene.cpp
 
-vector.o: vector.cpp
-	$(CC) $(CFLAGS) vector.cpp
+vector_sse.o: vector_sse.cpp
+	$(CC) $(CFLAGS) vector_sse.cpp
 
 clean:
 	\rm -rf *.o rt
