@@ -89,6 +89,12 @@ typedef union vu
    __m128 v;
    float array[4];
 } vector_access;
+
+typedef union ivu
+{
+   __m128i v;
+   int array[4];
+} integer_vector_access;
 #endif
 
 #ifdef SSE2_ENABLE
