@@ -150,12 +150,10 @@ int Color::ToInt(void)
 {
    __m128 mul = _mm_set1_ps(255.0f);
    mul = _mm_mul_ps(c, mul);
-   float fr = reinterpret_cast<vector_access&>(mul).array[3];
-   float fg = reinterpret_cast<vector_access&>(mul).array[2];
-   float fb = reinterpret_cast<vector_access&>(mul).array[1];
-	int red = lrintf(fr);
-	int green = lrintf(fg);
-	int blue = lrintf(fb);
+   __m128i ints = _mm_cvttps_epi32(mul);
+   int red = reinterpret_cast<integer_vector_access&>(ints).array[3];
+   int green = reinterpret_cast<integer_vector_access&>(ints).array[2];
+   int blue = reinterpret_cast<integer_vector_access&>(ints).array[1];
 	return ((red << 16) + (green << 8) + blue);
 }
 
@@ -163,12 +161,10 @@ RGBApixel Color::ToRGBAPixel(void)
 {
    __m128 mul = _mm_set1_ps(255.0f);
    mul = _mm_mul_ps(c, mul);
-   float fr = reinterpret_cast<vector_access&>(mul).array[3];
-   float fg = reinterpret_cast<vector_access&>(mul).array[2];
-   float fb = reinterpret_cast<vector_access&>(mul).array[1];
-   int red = lrintf(fr);
-   int green = lrintf(fg);
-   int blue = lrintf(fb);
+   __m128i ints = _mm_cvttps_epi32(mul);
+   int red = reinterpret_cast<integer_vector_access&>(ints).array[3];
+   int green = reinterpret_cast<integer_vector_access&>(ints).array[2];
+   int blue = reinterpret_cast<integer_vector_access&>(ints).array[1];
    RGBApixel p;
    p.Red = red;
    p.Green = green;
