@@ -9,6 +9,22 @@ Vector::~Vector(void)
 {
 }
 
+//the accessors
+float Vector::xv() const
+{
+   return x;
+}
+
+float Vector::yv() const
+{
+   return y;
+}
+
+float Vector::zv() const
+{
+   return z;
+}
+
 //the operators
 Vector Vector::operator +(const Vector &v) const
 {
@@ -128,4 +144,28 @@ Vector Vector::Cross(const Vector &v1, const Vector &v2)
 void Vector::Normalize(Vector &v)
 {
 	v.Normalize();
+}
+
+Vector Vector::Min(const Vector &v1, const Vector &v2)
+{
+   Vector m(v1);
+   if(v2.x < m.x)
+      m.x = v2.x;
+   if(v2.y < m.y)
+      m.y = v2.y;
+   if(v2.z < m.z)
+      m.z = v2.z;
+   return m;
+}
+
+Vector Vector::Max(const Vector &v1, const Vector &v2)
+{
+   Vector m(v1);
+   if(v2.x > m.x)
+      m.x = v2.x;
+   if(v2.y > m.y)
+      m.y = v2.y;
+   if(v2.z > m.z)
+      m.z = v2.z;
+   return m;
 }

@@ -97,13 +97,8 @@ typedef union ivu
 } integer_vector_access;
 #endif
 
-#ifdef SSE2_ENABLE
-   #include "color_sse.h"
-   #include "vector_sse.h"
-#else
-	#include "color.h"
-	#include "vector.h"
-#endif
+#include "color.h"
+#include "vector.h"
 #include "rendersurface.h"
 #include "ray.h"
 #include "camera.h"

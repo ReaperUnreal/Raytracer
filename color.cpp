@@ -9,6 +9,28 @@ Color::~Color(void)
 {
 }
 
+//accessors
+
+float Color::rv() const
+{
+   return r;
+}
+
+float Color::gv() const
+{
+   return g;
+}
+
+float Color::bv() const
+{
+   return b;
+}
+
+float Color::av() const
+{
+   return 1.0f;
+}
+
 //operators
 Color Color::operator *(const Color &c) const
 {

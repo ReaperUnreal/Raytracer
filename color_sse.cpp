@@ -24,22 +24,22 @@ Color::~Color(void)
 
 //accessors
 
-float Color::r() const
+float Color::rv() const
 {
    return array[3];
 }
 
-float Color::g() const
+float Color::gv() const
 {
    return array[2];
 }
 
-float Color::b() const
+float Color::bv() const
 {
    return array[1];
 }
 
-float Color::a() const
+float Color::av() const
 {
    return array[0];
 }

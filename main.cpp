@@ -123,17 +123,11 @@ void test()
 {
    Color v1(1.0f, 2.0f, -0.5f);
    Color v2(0.0f, 1.0f, 0.0f);
-   printf("(%0.1f, %0.1f, %0.1f)\n", v1.r(), v1.g(), v1.b());
-   printf("%#08x\n", &(v1.c));
-   printf("(%0.1f, %0.1f, %0.1f)\n", v2.r(), v2.g(), v2.b());
-   printf("%#08x\n", &(v2.c));
+   printf("(%0.1f, %0.1f, %0.1f)\n", v1.rv(), v1.gv(), v1.bv());
+   printf("(%0.1f, %0.1f, %0.1f)\n", v2.rv(), v2.gv(), v2.bv());
 
    Color x = v1 + v2;
-   printf("(%0.1f, %0.1f, %0.1f)\n", x.r(), x.g(), x.b());
-   printf("%#08x\n", &(x.c));
-
-   int c = x.ClampNormal().ToInt();
-   printf("%#08x\n", c);
+   printf("(%0.1f, %0.1f, %0.1f)\n", x.rv(), x.gv(), x.bv());
 }
 
 int main(int argc, char* argv[])

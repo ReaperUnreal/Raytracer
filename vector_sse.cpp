@@ -21,17 +21,17 @@ Vector::~Vector(void)
 }
 
 //the accessors
-float Vector::x() const
+float Vector::xv() const
 {
    return array[3];
 }
 
-float Vector::y() const
+float Vector::yv() const
 {
    return array[2];
 }
 
-float Vector::z() const
+float Vector::zv() const
 {
    return array[1];
 }

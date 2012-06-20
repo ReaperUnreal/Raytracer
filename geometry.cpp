@@ -199,7 +199,7 @@ Vector Plane::GeneratePoint() const
 {
 	float x = ((20.0f * lrflti(rand())) * MAX_RAND_DIVIDER) - 10.0f;
 	float y = ((20.0f * lrflti(rand())) * MAX_RAND_DIVIDER) - 10.0f;
-	float z = -((normal.x() * x + normal.y() * y + d) / normal.z());
+	float z = -((normal.xv() * x + normal.yv() * y + d) / normal.zv());
 	return Vector(x, y, z);
 }
 
