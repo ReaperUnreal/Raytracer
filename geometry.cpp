@@ -324,6 +324,86 @@ int Sphere::GetIntersectionPoints(Ray &r, float &d1, float &d2) const
 	return MISS;
 }
 
+//the Axis Aligned Box class
+AABox::AABox(const Vector &min, const Vector &max)
+{
+   //ensure min and max before storing
+   bounds[0] = Vector::Min(min, max);
+   bounds[1] = Vector::Max(min, max);
+}
+
+AABox::~AABox(void)
+{
+}
+
+Vector AABox::GetMin() const
+{
+   return bounds[0];
+}
+
+Vector AABox::GetMax() const
+{
+   return bounds[1];
+}
+
+int AABox::GetType() const
+{
+   return AABOX;
+}
+
+int AABox::Intersect(Ray &r, float &mindist) const
+{
+   float tmin, tmax, tymin, tymax, tzmin, tzmax;
+   Vector inv_dir = r.direction.Reciprocal();
+   float idx = inv_dir.xv();
+   float idy = inv_dir.yv();
+   float idz = inv_dir.zv();
+   float ox = r.origin.xv();
+   float oy = r.origin.yv();
+   float oz = r.origin.zv();
+   int sign[3] = {idx < 0, idy < 0, idz < 0};
+
+   tmin = (bounds[sign[0]].xv() - ox) * idx;
+   tmax = (bounds[1 - sign[0]].xv() - ox) * idx;
+   tymin = (bounds[sign[1]].yv() - oy) * idy;
+   tymax = (bounds[1 - sign[1]].yv() - oy) * idy;
+
+   if((tmin > tymax) || (tymin > tmax))
+      return MISS;
+   if(tymin > tmin)
+      tmin = tymin;
+   if(tymax < tmax)
+      tmax = tymax;
+
+   tzmin = (bounds[sign[2]].zv() - oz) * idz;
+   tzmax = (bounds[1 - sign[2]].zv() - oz) * idz;
+
+   if((tmin > tzmax) || (tzmin > tmax))
+      return MISS;
+   if(tzmin > tmin)
+      tmin = tzmin;
+   //if(tzmax < tmax)
+      //tmax = tzmax;
+
+   if(tmin < mindist)
+   {
+      mindist = tmin;
+      return HIT;
+   }
+
+   return MISS;
+}
+
+Vector AABox::GetNormal(Vector &pos) const
+{
+   return Vector();
+}
+
+Vector AABox::GeneratePoint() const
+{
+   return Vector();
+}
+
 //the Metaball class
 Metaball::Metaball(Sphere **ballList, int ballCount) : balls(ballList), numBalls(ballCount), threshold(1.0f), stepVal(0.01f)
 {

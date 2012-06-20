@@ -38,6 +38,7 @@ public:
 	float Dot(const Vector &iv) const;
 	Vector Cross(const Vector &iv) const;
 	void Normalize(void);
+   Vector Reciprocal(void) const;
 
 
 	static float Length(const Vector &iv);
@@ -47,6 +48,7 @@ public:
 	static void Normalize(Vector &v);
    static Vector Min(const Vector &v1, const Vector &v2);
    static Vector Max(const Vector &v1, const Vector &v2);
+   static Vector Reciprocal(const Vector &v);
 
 	//memory
 #ifdef SSE2_ENABLE

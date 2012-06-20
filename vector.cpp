@@ -169,3 +169,13 @@ Vector Vector::Max(const Vector &v1, const Vector &v2)
       m.z = v2.z;
    return m;
 }
+
+Vector Vector::Reciprocal() const
+{
+   return Vector(1.0f / x, 1.0f / y, 1.0f / z);
+}
+
+Vector Vector::Reciprocal(const Vector &v)
+{
+   return Vector(1.0f / v.x, 1.0f / v.y, 1.0f / v.z);
+}

@@ -47,7 +47,7 @@ public:
 		SPHERE = 1,
 		PLANE,
 		TRIANGLE,
-		BOX,
+		AABOX,
 		CYLINDER,
 		ELLIPSE,
 		QUADRIC,
@@ -124,6 +124,24 @@ public:
 private:
 	Vector position;
 	float radius, sqrRadius, invRadius;
+};
+
+//the Axis Aligned Box class
+class AABox : public Geometry
+{
+public:
+   AABox(const Vector &min, const Vector &max);
+   virtual ~AABox(void);
+
+   Vector GetMin() const;
+   Vector GetMax() const;
+
+   Vector GetNormal(Vector &pos) const;
+   int Intersect(Ray &r, float &mindist) const;
+   int GetType() const;
+   Vector GeneratePoint() const;
+private:
+   Vector bounds[2];
 };
 
 //the Metalball class
