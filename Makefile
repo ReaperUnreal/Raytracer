@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-c -Wall -fopenmp -DOMP_ENABLE -march=core2
+CFLAGS=-c -Wall -fopenmp -march=core2
 LFLAGS=-fopenmp
 EXECUTABLE=rt
 EASY_BMP_CFLAGS=-c -fopenmp -O3 -march=core2 -mrecip
@@ -12,7 +12,7 @@ ifndef DISABLE_SSE
 endif
 CFLAGS += $(SSE_FLAGS)
 
-all: CFLAGS+=-O3 -ffast-math -fprefetch-loop-arrays -funsafe-loop-optimizations -fno-signed-zeros -fno-trapping-math -fassociative-math -freciprocal-math -mrecip
+all: CFLAGS+=-O3 -DOMP_ENABLE -ffast-math -fprefetch-loop-arrays -funsafe-loop-optimizations -fno-signed-zeros -fno-trapping-math -fassociative-math -freciprocal-math -mrecip
 all: $(EXECUTABLE)
 
 debug: CFLAGS+=-g

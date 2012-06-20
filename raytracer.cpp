@@ -96,24 +96,23 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 		return NULL;
 	dist = 1000000.0f;
 	Vector intersection, L, N, V, R, sampleDir, samplePos;
-	Geometry *geom = NULL, *pg = NULL, *light = NULL, *shadowObj = NULL, *ambientObj = NULL;
+	Geometry *geom = NULL;
 	int result = 0;
-	int res, l, s;
-	int numItems = sc->GetNumObjects();
-	float dot, diff, spec, shade, ldist, rdist, tempdist, ambient;
+	int res;
+	float dot, diff, spec, shade, ldist, rdist, tempdist;
 	float step = 1.0f / lrflti(shadowQuality);
 	Color diffuse, specular, reflection, accumulator;
 	Ray shadow, ambientRay;
 	bool inShade;
 
 	//find the nearest intersection
-	for(int i = 0; i < numItems; i++)
+   vector<Geometry *> &gv = sc->GetObjects();
+   for(vector<Geometry *>::iterator git = gv.begin(); git != gv.end(); git++)
 	{
-		pg = sc->GetObjectAt(i);
-      res = pg->Intersect(r, dist);
+      res = (*git)->Intersect(r, dist);
 		if(res)
 		{
-			geom = pg;
+			geom = *git;
 			result = res;
 		}
 	}
@@ -132,12 +131,12 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 		intersection = r.origin + (r.direction * dist);
 
 		//accumulate the lighting
-		for(l = 0; l < numItems; l++)
+      vector<Geometry *> &lov = sc->GetObjects();
+      for(vector<Geometry *>::iterator lit = lov.begin(); lit != lov.end(); lit++)
 		{
-			light = sc->GetObjectAt(l);
-			if((light->IsLight()) && (light->GetType() == Geometry::SPHERE))
+			if(((*lit)->IsLight()) && ((*lit)->GetType() == Geometry::SPHERE))
 			{
-				L = ((Sphere *)light)->GetPosition() - intersection;
+				L = ((Sphere *)(*lit))->GetPosition() - intersection;
 				ldist = L.Length();
 				L /= ldist;
 
@@ -147,10 +146,10 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 					shade = 1.0f;
 					shadow.origin = intersection + L * EPSILON;
 					shadow.direction = L;
-					for(s = 0; s < numItems; s++)
+               vector<Geometry *> &sov = sc->GetObjects();
+               for(vector<Geometry *>::iterator sit = sov.begin(); sit != sov.end(); sit++)
 					{
-						shadowObj = sc->GetObjectAt(s);
-						if((shadowObj != light) && (shadowObj->Intersect(shadow, ldist)))
+						if((*sit != *lit) && ((*sit)->Intersect(shadow, ldist)))
 						{
 							shade = 0.0f;
 							break;
@@ -166,14 +165,14 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 					//#pragma omp parallel for default(none) shared(light, intersection, ldist, numItems, step) private(i, inShade, tempdist, shadowObj, s) firstprivate(shadow) reduction(+:shade) schedule(dynamic, 1)
 					for(i = 0; i < shadowQuality; i++)
 					{
-						shadow.direction = light->GeneratePoint() - intersection;
+						shadow.direction = (*lit)->GeneratePoint() - intersection;
 						shadow.direction.Normalize();
 						inShade = false;
 						tempdist = ldist;
-						for(s = 0; s < numItems; s++)
+                  vector<Geometry *> &sov = sc->GetObjects();
+                  for(vector<Geometry *>::iterator sit = sov.begin(); sit != sov.end(); sit++)
 						{
-							shadowObj = sc->GetObjectAt(s);
-							if((shadowObj != light) && (shadowObj->Intersect(shadow, tempdist)))
+							if((*sit != *lit) && ((*sit)->Intersect(shadow, tempdist)))
 							{
 								inShade = true;
 								break;
@@ -198,7 +197,7 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 						if(dot > 0)
 						{
 							diff = dot * geom->GetMaterial().GetDiffuse();
-							diffuse = geom->GetMaterial().GetColor() * light->GetMaterial().GetColor() * diff;
+							diffuse = geom->GetMaterial().GetColor() * (*lit)->GetMaterial().GetColor() * diff;
 						}
 					}
 
@@ -211,7 +210,7 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 						if(dot > 0)
 						{
 							spec = powf(dot, 20.0f) * geom->GetMaterial().GetSpecular();
-							specular = geom->GetMaterial().GetSpecularColor() * light->GetMaterial().GetColor() * spec;
+							specular = geom->GetMaterial().GetSpecularColor() * (*lit)->GetMaterial().GetColor() * spec;
 						}
 					}
 
@@ -221,6 +220,8 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 		} //end light loop
 
 		//calculate ambient lighting
+      //TODO: This is actually totally broken right now, do real math later
+#if 0
 		if(occlusion > 1)
 		{
 			//initialize the ambient light
@@ -253,7 +254,8 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 				for(s = 0; s < numItems; s++)
 				{
 					ambientObj = sc->GetObjectAt(s);
-					if((ambientObj != light) && (ambientObj->Intersect(ambientRay, ambdist)))
+					if((!ambientObj->IsLight()) && (ambientObj->Intersect(ambientRay, ambdist)))
+					//if((ambientObj != light) && (ambientObj->Intersect(ambientRay, ambdist)))
 					{
 						intersected = true;
 						break;
@@ -268,6 +270,7 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 
 			col += geom->GetMaterial().GetColor() * geom->GetMaterial().GetDiffuse() * ambient;
 		}
+#endif
 		
 		//get reflection
 		if(geom->GetMaterial().GetReflectivity() > 0)

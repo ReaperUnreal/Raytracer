@@ -6,6 +6,7 @@
 #include <memory.h>
 #include <string>
 #include <stdio.h>
+#include <vector>
 #ifdef OMP_ENABLE
    #include <omp.h>
 #endif
@@ -22,6 +23,8 @@
    #include <unistd.h>
 #endif
 #include "EasyBMP.h"
+
+using namespace std;
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
