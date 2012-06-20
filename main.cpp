@@ -58,17 +58,17 @@ void setupScene()
 	Plane *wall = new Plane(Vector(0.0f, 0.0f, 1.0f), 6.0f);
 	wall->GetMaterial().SetColor(Color::white);
 	wall->GetMaterial().SetDiffuse(1.0f);
-	scene->AddObject(wall);
+   scene->AddObject(wall);
 
 	Plane *wall2 = new Plane(Vector(1.0f, 0.0f, 0.0f), 6.0f);
 	wall2->GetMaterial().SetColor(Color::red);
 	wall2->GetMaterial().SetDiffuse(1.0f);
-	scene->AddObject(wall2);
+   scene->AddObject(wall2);
 
 	Plane *wall3 = new Plane(Vector(-1.0f, 0.0f, 0.0f), 6.0f);
 	wall3->GetMaterial().SetColor(Color::blue);
 	wall3->GetMaterial().SetDiffuse(1.0f);
-	scene->AddObject(wall3);
+   scene->AddObject(wall3);
 
 	Sphere **sphereList = new Sphere*[3];
 	sphereList[0] = new Sphere(Vector(-1.0f, 0.0f, 0.0f), 0.5f);
@@ -85,10 +85,10 @@ void setupScene()
 	raytracer->SetScene(scene);
 
 	//unthinkable without multithreading
-	raytracer->SetShadowQuality(2);
+	raytracer->SetShadowQuality(16);
 	raytracer->SetMultisampling(1);
 	raytracer->SetReflectionBlur(1);
-	//raytracer->SetOcclusion(16);
+   raytracer->SetOcclusion(1);
 }
 
 void cleanupScene()
@@ -163,6 +163,7 @@ int main(int argc, char* argv[])
 	//cleanup everything
    printf("Cleanup\n");
 	cleanupScene();
+
 
    return 0;
 }
