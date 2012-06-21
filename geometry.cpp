@@ -355,8 +355,10 @@ int AABox::Intersect(Ray &r, float &mindist) const
 {
    //smits' method
    float tmin, tmax, tymin, tymax, tzmin, tzmax;
+   Vector invdir = r.direction.Reciprocal();
+
    float dirx = r.direction.xv();
-   float invdirx = 1.0f / dirx;
+   float invdirx = invdir.xv();
    if(dirx >= 0)
    {
       tmin = (bounds[0].xv() - r.origin.xv()) * invdirx;
@@ -368,7 +370,7 @@ int AABox::Intersect(Ray &r, float &mindist) const
       tmax = (bounds[0].xv() - r.origin.xv()) * invdirx;
    }
    float diry = r.direction.yv();
-   float invdiry = 1.0f / diry;
+   float invdiry = invdir.yv();
    if(diry >= 0)
    {
       tymin = (bounds[0].yv() - r.origin.yv()) * invdiry;
@@ -389,7 +391,7 @@ int AABox::Intersect(Ray &r, float &mindist) const
       tmax = tymax;
 
    float dirz = r.direction.zv();
-   float invdirz = 1.0f / dirz;
+   float invdirz = invdir.zv();
    if(dirz >= 0)
    {
       tzmin = (bounds[0].zv() - r.origin.zv()) * invdirz;

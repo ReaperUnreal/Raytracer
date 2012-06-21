@@ -250,13 +250,15 @@ Vector Vector::Max(const Vector &v1, const Vector &v2)
 
 Vector Vector::Reciprocal() const
 {
-   __m128 res = _mm_rcp_ps(v);
+	__m128 v1 = _mm_set1_ps(1.0f);
+   __m128 res = _mm_div_ps(v1, v);
    return Vector(res);
 }
 
 Vector Vector::Reciprocal(const Vector &v)
 {
-   __m128 res = _mm_rcp_ps(v.v);
+	__m128 v1 = _mm_set1_ps(1.0f);
+   __m128 res = _mm_div_ps(v1, v.v);
    return Vector(res);
 }
 
