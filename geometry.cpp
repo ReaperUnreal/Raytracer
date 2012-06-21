@@ -355,25 +355,29 @@ int AABox::Intersect(Ray &r, float &mindist) const
 {
    //smits' method
    float tmin, tmax, tymin, tymax, tzmin, tzmax;
-   if(r.direction.xv() >= 0)
+   float dirx = r.direction.xv();
+   float invdirx = 1.0f / dirx;
+   if(dirx >= 0)
    {
-      tmin = (bounds[0].xv() - r.origin.xv()) / r.direction.xv();
-      tmax = (bounds[1].xv() - r.origin.xv()) / r.direction.xv();
+      tmin = (bounds[0].xv() - r.origin.xv()) * invdirx;
+      tmax = (bounds[1].xv() - r.origin.xv()) * invdirx;
    }
    else
    {
-      tmin = (bounds[1].xv() - r.origin.xv()) / r.direction.xv();
-      tmax = (bounds[0].xv() - r.origin.xv()) / r.direction.xv();
+      tmin = (bounds[1].xv() - r.origin.xv()) * invdirx;
+      tmax = (bounds[0].xv() - r.origin.xv()) * invdirx;
    }
-   if(r.direction.yv() >= 0)
+   float diry = r.direction.yv();
+   float invdiry = 1.0f / diry;
+   if(diry >= 0)
    {
-      tymin = (bounds[0].yv() - r.origin.yv()) / r.direction.yv();
-      tymax = (bounds[1].yv() - r.origin.yv()) / r.direction.yv();
+      tymin = (bounds[0].yv() - r.origin.yv()) * invdiry;
+      tymax = (bounds[1].yv() - r.origin.yv()) * invdiry;
    }
    else
    {
-      tymin = (bounds[1].yv() - r.origin.yv()) / r.direction.yv();
-      tymax = (bounds[0].yv() - r.origin.yv()) / r.direction.yv();
+      tymin = (bounds[1].yv() - r.origin.yv()) * invdiry;
+      tymax = (bounds[0].yv() - r.origin.yv()) * invdiry;
    }
 
    if((tmin > tymax) || (tymin > tmax))
@@ -384,15 +388,17 @@ int AABox::Intersect(Ray &r, float &mindist) const
    if(tymax < tmax)
       tmax = tymax;
 
-   if(r.direction.zv() >= 0)
+   float dirz = r.direction.zv();
+   float invdirz = 1.0f / dirz;
+   if(dirz >= 0)
    {
-      tzmin = (bounds[0].zv() - r.origin.zv()) / r.direction.zv();
-      tzmax = (bounds[1].zv() - r.origin.zv()) / r.direction.zv();
+      tzmin = (bounds[0].zv() - r.origin.zv()) * invdirz;
+      tzmax = (bounds[1].zv() - r.origin.zv()) * invdirz;
    }
    else
    {
-      tzmin = (bounds[1].zv() - r.origin.zv()) / r.direction.zv();
-      tzmax = (bounds[0].zv() - r.origin.zv()) / r.direction.zv();
+      tzmin = (bounds[1].zv() - r.origin.zv()) * invdirz;
+      tzmax = (bounds[0].zv() - r.origin.zv()) * invdirz;
    }
 
    if((tmin > tzmax) || (tzmin > tmax))
