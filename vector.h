@@ -39,6 +39,7 @@ public:
 	Vector Cross(const Vector &iv) const;
 	void Normalize(void);
    Vector Reciprocal(void) const;
+   Vector Abs(void) const;
 
 
 	static float Length(const Vector &iv);
@@ -49,6 +50,7 @@ public:
    static Vector Min(const Vector &v1, const Vector &v2);
    static Vector Max(const Vector &v1, const Vector &v2);
    static Vector Reciprocal(const Vector &v);
+   static Vector Abs(const Vector &v);
 
 	//memory
 #ifdef SSE2_ENABLE

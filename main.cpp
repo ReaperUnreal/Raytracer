@@ -24,7 +24,7 @@ void setupScene()
 	sphere->GetMaterial().SetDiffuse(1.0f);
 	sphere->GetMaterial().SetSpecular(0.0f);
 	sphere->GetMaterial().SetReflectivity(0.0f);
-	scene->AddObject(sphere);
+	//scene->AddObject(sphere);
 
 	Sphere *smaller = new Sphere(Vector(2.0f, -1.5f, 1.3f), 0.5f);
 	smaller->GetMaterial().SetColor(Color::blue);
@@ -53,22 +53,22 @@ void setupScene()
 	Plane *floor = new Plane(Vector(0.0f, 1.0f, 0.0f), 2.0f);
 	floor->GetMaterial().SetColor(Color::white);
 	floor->GetMaterial().SetDiffuse(1.0f);
-	scene->AddObject(floor);
+	//scene->AddObject(floor);
 
 	Plane *wall = new Plane(Vector(0.0f, 0.0f, 1.0f), 6.0f);
 	wall->GetMaterial().SetColor(Color::white);
 	wall->GetMaterial().SetDiffuse(1.0f);
-   scene->AddObject(wall);
+   //scene->AddObject(wall);
 
 	Plane *wall2 = new Plane(Vector(1.0f, 0.0f, 0.0f), 6.0f);
 	wall2->GetMaterial().SetColor(Color::red);
 	wall2->GetMaterial().SetDiffuse(1.0f);
-   scene->AddObject(wall2);
+   //scene->AddObject(wall2);
 
 	Plane *wall3 = new Plane(Vector(-1.0f, 0.0f, 0.0f), 6.0f);
 	wall3->GetMaterial().SetColor(Color::blue);
 	wall3->GetMaterial().SetDiffuse(1.0f);
-   scene->AddObject(wall3);
+   //scene->AddObject(wall3);
 
 	Sphere **sphereList = new Sphere*[3];
 	sphereList[0] = new Sphere(Vector(-1.0f, 0.0f, 0.0f), 0.5f);
@@ -82,13 +82,18 @@ void setupScene()
 	metaball->GetMaterial().SetReflectivity(0.0f);
 	//scene->AddObject(metaball);
 
+   AABox *box = new AABox(Vector(1.0f, -2.5f, -2.0f), Vector(3.0f, -0.5f, 0.0f));
+   box->GetMaterial().SetColor(Color::white);
+   box->GetMaterial().SetDiffuse(1.0f);
+   scene->AddObject(box);
+
 	raytracer->SetScene(scene);
 
 	//unthinkable without multithreading
-	raytracer->SetShadowQuality(16);
+	raytracer->SetShadowQuality(1);
 	raytracer->SetMultisampling(1);
 	raytracer->SetReflectionBlur(1);
-   raytracer->SetOcclusion(1);
+   raytracer->SetOcclusion(0);
 }
 
 void cleanupScene()

@@ -31,7 +31,7 @@ const int SCREEN_HEIGHT = 480;
 const float PI = 3.14159265358979323846264338327950288419716939937511f; //lol, 50 digits!
 const float TWOPI = PI * 2.0f;
 const float PIBYTWO = PI * 0.5f;
-const float EPSILON = 0.00001f;
+const float EPSILON = 0.0001f;
 const float MAX_RAND_DIVIDER = 1.0f / RAND_MAX;
 
 inline bool FloatEquals(float a, float b)

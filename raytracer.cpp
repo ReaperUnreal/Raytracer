@@ -8,7 +8,7 @@ Raytracer::Raytracer(void)
 	shadowQuality = 1;
 	reflectionBlur = 1;
 	multisampling = 1;
-	occlusion = 1;
+	occlusion = 0;
 }
 
 Raytracer::~Raytracer(void)
@@ -82,7 +82,7 @@ int Raytracer::GetMultisampling(void)
 
 void Raytracer::SetOcclusion(int numSamples)
 {
-	occlusion = (numSamples > 1) ? numSamples : 1;
+	occlusion = (numSamples > 0) ? numSamples : 0;
 }
 
 int Raytracer::GetOcclusion(void)
@@ -215,6 +215,7 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 					}
 
                col += (diffuse + specular) * shade;
+               //col += geom->GetMaterial().GetColor();
 				}
 			}
 		} //end light loop
@@ -348,7 +349,7 @@ void Raytracer::Render(void)
 
 	//render each line in parallel
 	int y, x, s;
-	float u, v;
+	float u = 0.0f, v = 0.0f;
 #ifdef OMP_ENABLE
    #pragma omp parallel for default(none) shared(height, width, dy, dx, o, surface, topleft, offset, numSamples, divider) private(x, y, screenpos, pixel, dir, geom, s, accumulator, u, v) firstprivate(r, dist) schedule(dynamic, 1)
 #endif
@@ -365,8 +366,10 @@ void Raytracer::Render(void)
 				//clear out the pixel
 				pixel = Color::black;
 				//create the ray
-				u = lrflti(rand()) * MAX_RAND_DIVIDER;
-				v = lrflti(rand()) * MAX_RAND_DIVIDER;
+            //u = lrflti(rand()) * MAX_RAND_DIVIDER;
+            //v = lrflti(rand()) * MAX_RAND_DIVIDER;
+            u = 0.0f;
+            v = 0.0f;
 				dir = screenpos - offset + (dx * u) + (dy * v);
 				dir = dir / dir.Length();
 				r.direction = dir;

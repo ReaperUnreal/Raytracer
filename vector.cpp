@@ -179,3 +179,13 @@ Vector Vector::Reciprocal(const Vector &v)
 {
    return Vector(1.0f / v.x, 1.0f / v.y, 1.0f / v.z);
 }
+
+Vector Vector::Abs() const
+{
+   return Vector(fabsf(x), fabsf(y), fabsf(z));
+}
+
+Vector Vector::Abs(const Vector &v)
+{
+   return Vector(fabsf(v.x), fabsf(v.y), fabsf(v.z));
+}

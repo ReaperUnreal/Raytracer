@@ -353,6 +353,64 @@ int AABox::GetType() const
 
 int AABox::Intersect(Ray &r, float &mindist) const
 {
+   //smits' method
+   float tmin, tmax, tymin, tymax, tzmin, tzmax;
+   if(r.direction.xv() >= 0)
+   {
+      tmin = (bounds[0].xv() - r.origin.xv()) / r.direction.xv();
+      tmax = (bounds[1].xv() - r.origin.xv()) / r.direction.xv();
+   }
+   else
+   {
+      tmin = (bounds[1].xv() - r.origin.xv()) / r.direction.xv();
+      tmax = (bounds[0].xv() - r.origin.xv()) / r.direction.xv();
+   }
+   if(r.direction.yv() >= 0)
+   {
+      tymin = (bounds[0].yv() - r.origin.yv()) / r.direction.yv();
+      tymax = (bounds[1].yv() - r.origin.yv()) / r.direction.yv();
+   }
+   else
+   {
+      tymin = (bounds[1].yv() - r.origin.yv()) / r.direction.yv();
+      tymax = (bounds[0].yv() - r.origin.yv()) / r.direction.yv();
+   }
+
+   if((tmin > tymax) || (tymin > tmax))
+      return MISS;
+
+   if(tymin > tmin)
+      tmin = tymin;
+   if(tymax < tmax)
+      tmax = tymax;
+
+   if(r.direction.zv() >= 0)
+   {
+      tzmin = (bounds[0].zv() - r.origin.zv()) / r.direction.zv();
+      tzmax = (bounds[1].zv() - r.origin.zv()) / r.direction.zv();
+   }
+   else
+   {
+      tzmin = (bounds[1].zv() - r.origin.zv()) / r.direction.zv();
+      tzmax = (bounds[0].zv() - r.origin.zv()) / r.direction.zv();
+   }
+
+   if((tmin > tzmax) || (tzmin > tmax))
+      return MISS;
+
+   if(tzmin > tmin)
+      tmin = tzmin;
+   if(tzmax < tmax)
+      tmax = tzmax;
+
+   if((tmin < mindist) && (tmax > 0))
+   {
+      mindist = tmin;
+      return HIT;
+   }
+
+   //optimized method that doesn't seem to work
+#if 0
    float tmin, tmax, tymin, tymax, tzmin, tzmax;
    Vector inv_dir = r.direction.Reciprocal();
    float idx = inv_dir.xv();
@@ -390,18 +448,51 @@ int AABox::Intersect(Ray &r, float &mindist) const
       mindist = tmin;
       return HIT;
    }
+#endif
 
    return MISS;
 }
 
 Vector AABox::GetNormal(Vector &pos) const
 {
-   return Vector();
+   Vector mind = Vector::Abs(pos - bounds[0]);
+   Vector maxd = Vector::Abs(pos - bounds[1]);
+
+   float vals[6] = {mind.xv(), mind.yv(), mind.zv(), maxd.xv(), maxd.yv(), maxd.zv()};
+   float min = vals[0];
+   int mini = 0;
+   for(int i = 1; i < 6; i++)
+   {
+      if(vals[i] < min)
+      {
+         min = vals[i];
+         mini = i;
+      }
+   }
+
+   switch(mini)
+   {
+      case 0:
+         return Vector(-1, 0, 0);
+      case 1:
+         return Vector(0, -1, 0);
+      case 2:
+         return Vector(0, 0, -1);
+      case 3:
+         return Vector(1, 0, 0);
+      case 4:
+         return Vector(0, 1, 0);
+      case 5:
+         return Vector(0, 0, 1);
+      default: break;
+   }
+
+   return Vector(1, 0, 0);
 }
 
 Vector AABox::GeneratePoint() const
 {
-   return Vector();
+   return (bounds[0] + bounds[1]) * 0.5f;
 }
 
 //the Metaball class

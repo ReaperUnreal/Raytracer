@@ -249,3 +249,17 @@ Vector Vector::Reciprocal(const Vector &v)
    __m128 res = _mm_rcp_ps(v.v);
    return Vector(res);
 }
+
+Vector Vector::Abs() const
+{
+   static const __m128 SIGNMASK = _mm_castsi128_ps(_mm_set1_epi32(0x80000000));
+   __m128 res = _mm_andnot_ps(SIGNMASK, v);
+   return Vector(res);
+}
+
+Vector Vector::Abs(const Vector &v)
+{
+   static const __m128 SIGNMASK = _mm_castsi128_ps(_mm_set1_epi32(0x80000000));
+   __m128 res = _mm_andnot_ps(SIGNMASK, v.v);
+   return Vector(res);
+}
