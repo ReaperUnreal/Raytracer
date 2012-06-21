@@ -53,6 +53,11 @@ Vector Vector::operator *(float f) const
 	return Vector(_mm_mul_ps(v, vf));
 }
 
+Vector Vector::operator *(const Vector &iv) const
+{
+   return Vector(_mm_mul_ps(v, iv.v));
+}
+
 Vector Vector::operator =(const Vector &iv)
 {
    v = iv.v;
@@ -97,6 +102,11 @@ void Vector::operator +=(const Vector &iv)
 void Vector::operator -=(const Vector &iv)
 {
 	v = _mm_sub_ps(v, iv.v);
+}
+
+void Vector::operator *=(const Vector &iv)
+{
+	v = _mm_mul_ps(v, iv.v);
 }
 
 float Vector::Length(void) const

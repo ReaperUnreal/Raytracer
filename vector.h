@@ -23,12 +23,14 @@ public:
 	//operators
 	Vector operator+(const Vector &iv) const;
 	Vector operator-(const Vector &iv) const;
+   Vector operator*(const Vector &iv) const;
 	Vector operator=(const Vector &iv);
 	Vector operator*(float f) const;
 	Vector operator/(float f) const;
 
 	void operator+=(const Vector &iv);
 	void operator-=(const Vector &iv);
+   void operator*=(const Vector &iv);
 	void operator*=(float f);
 	void operator/=(float f);
 	

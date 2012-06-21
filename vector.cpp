@@ -36,6 +36,11 @@ Vector Vector::operator -(const Vector &v) const
 	return Vector(x - v.x, y - v.y, z - v.z);
 }
 
+Vector Vector::operator *(const Vector &v) const
+{
+   return Vector(x * v.x, y * v.y, z * v.z);
+}
+
 Vector Vector::operator *(float f) const
 {
 	return Vector(f * x, f * y, f * z);
@@ -90,6 +95,13 @@ void Vector::operator -=(const Vector &v)
 	x -= v.x;
 	y -= v.y;
 	z -= v.z;
+}
+
+void Vector::operator *=(const Vector &v)
+{
+   x *= v.x;
+   y *= v.y;
+   z *= v.z;
 }
 
 float Vector::Length(void) const

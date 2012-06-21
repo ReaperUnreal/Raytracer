@@ -24,7 +24,7 @@ void setupScene()
 	sphere->GetMaterial().SetDiffuse(1.0f);
 	sphere->GetMaterial().SetSpecular(0.0f);
 	sphere->GetMaterial().SetReflectivity(0.0f);
-	//scene->AddObject(sphere);
+   scene->AddObject(sphere);
 
 	Sphere *smaller = new Sphere(Vector(2.0f, -1.5f, 1.3f), 0.5f);
 	smaller->GetMaterial().SetColor(Color::blue);
@@ -53,7 +53,7 @@ void setupScene()
 	Plane *floor = new Plane(Vector(0.0f, 1.0f, 0.0f), 2.0f);
 	floor->GetMaterial().SetColor(Color::white);
 	floor->GetMaterial().SetDiffuse(1.0f);
-	//scene->AddObject(floor);
+   //scene->AddObject(floor);
 
 	Plane *wall = new Plane(Vector(0.0f, 0.0f, 1.0f), 6.0f);
 	wall->GetMaterial().SetColor(Color::white);
@@ -82,18 +82,33 @@ void setupScene()
 	metaball->GetMaterial().SetReflectivity(0.0f);
 	//scene->AddObject(metaball);
 
-   AABox *box = new AABox(Vector(1.0f, -2.5f, -2.0f), Vector(3.0f, -0.5f, 0.0f));
-   box->GetMaterial().SetColor(Color::white);
-   box->GetMaterial().SetDiffuse(1.0f);
-   scene->AddObject(box);
+   AABox *floorbox = new AABox(Vector(-6.0f, -2.5f, -6.0f), Vector(6.0f, -2.0f, 6.0f));
+   floorbox->GetMaterial().SetColor(Color::white);
+   floorbox->GetMaterial().SetDiffuse(1.0f);
+   scene->AddObject(floorbox);
+
+   AABox *wallbox1 = new AABox(Vector(-6.0f, -2.0f, -6.5f), Vector(6.0f, 6.0f, -6.0f));
+   wallbox1->GetMaterial().SetColor(Color::white);
+   wallbox1->GetMaterial().SetDiffuse(1.0f);
+   scene->AddObject(wallbox1);
+
+   AABox *wallbox2 = new AABox(Vector(-6.5f, -2.0f, -6.0f), Vector(-6.0f, 6.0f, 6.0f));
+   wallbox2->GetMaterial().SetColor(Color::red);
+   wallbox2->GetMaterial().SetDiffuse(1.0f);
+   scene->AddObject(wallbox2);
+
+   AABox *wallbox3 = new AABox(Vector(6.0f, -2.0f, -6.0f), Vector(6.5f, 6.0f, 6.0f));
+   wallbox3->GetMaterial().SetColor(Color::blue);
+   wallbox3->GetMaterial().SetDiffuse(1.0f);
+   scene->AddObject(wallbox3);
 
 	raytracer->SetScene(scene);
 
 	//unthinkable without multithreading
-	raytracer->SetShadowQuality(1);
-	raytracer->SetMultisampling(1);
+	raytracer->SetShadowQuality(8);
+	raytracer->SetMultisampling(4);
 	raytracer->SetReflectionBlur(1);
-   raytracer->SetOcclusion(0);
+   raytracer->SetOcclusion(16);
 }
 
 void cleanupScene()
