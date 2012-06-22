@@ -13,6 +13,11 @@
 #ifdef SSE2_ENABLE
    #ifdef __linux__
       #include <immintrin.h>
+      //#ifdef __SSE4_1__
+         //#include <smmintrin.h>
+      //#else
+         //#include <tmmintrin.h>
+      //#endif
    #else
       #include <intrin.h>
       #include <xmmintrin.h>
