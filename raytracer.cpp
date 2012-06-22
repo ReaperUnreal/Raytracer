@@ -266,7 +266,7 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 				}
 			}
 
-         col += geom->GetMaterial().GetColor() * geom->GetMaterial().GetDiffuse() * ambient * shade;
+         col += geom->GetMaterial().GetColor() * geom->GetMaterial().GetDiffuse() * ambient;
 		}
 		
 		//get reflection
@@ -366,10 +366,8 @@ void Raytracer::Render(void)
 				//clear out the pixel
 				pixel = Color::black;
 				//create the ray
-            //u = lrflti(rand()) * MAX_RAND_DIVIDER;
-            //v = lrflti(rand()) * MAX_RAND_DIVIDER;
-            u = 0.0f;
-            v = 0.0f;
+            u = lrflti(rand()) * MAX_RAND_DIVIDER;
+            v = lrflti(rand()) * MAX_RAND_DIVIDER;
 				dir = screenpos - offset + (dx * u) + (dy * v);
 				dir = dir / dir.Length();
 				r.direction = dir;

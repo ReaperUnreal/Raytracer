@@ -27,10 +27,11 @@ void setupScene()
    scene->AddObject(sphere);
 
 	Sphere *smaller = new Sphere(Vector(2.0f, -1.5f, 1.3f), 0.5f);
-	smaller->GetMaterial().SetColor(Color::blue);
-	smaller->GetMaterial().SetDiffuse(1.0f);
+	smaller->GetMaterial().SetColor(Color::white);
+	smaller->GetMaterial().SetDiffuse(0.0f);
 	smaller->GetMaterial().SetSpecular(0.0f);
-	//scene->AddObject(smaller);
+   smaller->GetMaterial().SetReflectivity(1.0f);
+   scene->AddObject(smaller);
 
 	Sphere *another = new Sphere(Vector(6.0f, -1.0f, -4.0f), 1.0f);
 	another->GetMaterial().SetColor(Color::red);
@@ -105,10 +106,10 @@ void setupScene()
 	raytracer->SetScene(scene);
 
 	//unthinkable without multithreading
-	raytracer->SetShadowQuality(1);
-	raytracer->SetMultisampling(1);
-	raytracer->SetReflectionBlur(1);
-   raytracer->SetOcclusion(0);
+	raytracer->SetShadowQuality(128);
+	raytracer->SetMultisampling(32);
+	raytracer->SetReflectionBlur(128);
+   raytracer->SetOcclusion(128);
 }
 
 void cleanupScene()
