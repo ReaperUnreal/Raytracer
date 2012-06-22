@@ -251,6 +251,57 @@ Vector Sphere::GetNormal(Vector &pos) const
 
 int Sphere::Intersect(Ray &r, float &mindist) const
 {
+#ifdef SSE2_ENABLE
+   static const __m128 SIGNMASK = _mm_castsi128_ps(_mm_set1_epi32(0x80000000));
+   __m128 v = _mm_sub_ps(r.origin.v, position.v);
+   #ifdef __SSE4_1__
+      __m128 b = _mm_dp_ps(v, r.direction.v, 0xEF);
+   #else
+      __m128 b = _mm_mul_ps(v, r.direction.v);
+      b = _mm_hadd_ps(b, b);
+      b = _mm_hadd_ps(b, b);
+   #endif
+   __m128 b2 = _mm_mul_ps(b, b);
+   #ifdef __SSE4_1__
+      __m128 vmag2 = _mm_dp_ps(v, v, 0xEF);
+   #else
+      __m128 vmag2 = _mm_mul_ps(v, v);
+      vmag2 = _mm_hadd_ps(vmag2, vmag2);
+      vmag2 = _mm_hadd_ps(vmag2, vmag2);
+   #endif
+   __m128 r2 = _mm_set1_ps(sqrRadius);
+   b = _mm_xor_ps(b, SIGNMASK); //wait until the last second to negate b
+
+   __m128 det = _mm_sub_ps(b2, vmag2);
+   det = _mm_add_ps(det, r2); //determinant is now in all slots of the vector
+   int retval = MISS;
+   if(_mm_comigt_ss(det, _mm_setzero_ps()))
+   {
+      det = _mm_sqrt_ps(det);
+      __m128 i2v = _mm_add_ps(b, det); //addsub would just be stupid
+      if(_mm_comigt_ss(i2v, _mm_setzero_ps()))
+      {
+         __m128 i1v = _mm_sub_ps(b, det);
+         __m128 minv = _mm_set1_ps(mindist);
+         if(_mm_comilt_ss(i1v, _mm_setzero_ps()))
+         {
+            if(_mm_comilt_ss(i2v, minv))
+            {
+               mindist = reinterpret_cast<vector_access&>(i2v).array[0];
+               retval = INPRIM;
+            }
+         }
+         else
+         {
+            if(_mm_comilt_ss(i1v, minv))
+            {
+               mindist = reinterpret_cast<vector_access&>(i1v).array[0];
+               retval = HIT;
+            }
+         }
+      }
+   }
+#else
 	Vector v = r.origin - position;
 	float b = -v.Dot(r.direction);
 	float det = (b * b) - v.Dot(v) + sqrRadius;
@@ -258,10 +309,10 @@ int Sphere::Intersect(Ray &r, float &mindist) const
 	if(det > 0)
 	{
 		det = sqrtf(det);
-		float i1 = b - det;
 		float i2 = b + det;
 		if(i2 > 0)
 		{
+         float i1 = b - det;
 			if(i1 < 0)
 			{
 				if(i2 < mindist)
@@ -280,6 +331,7 @@ int Sphere::Intersect(Ray &r, float &mindist) const
 			}
 		}
 	}
+#endif
 	return retval;
 }
 

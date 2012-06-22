@@ -106,10 +106,10 @@ void setupScene()
 	raytracer->SetScene(scene);
 
 	//unthinkable without multithreading
-	raytracer->SetShadowQuality(128);
-	raytracer->SetMultisampling(32);
-	raytracer->SetReflectionBlur(128);
-   raytracer->SetOcclusion(128);
+	raytracer->SetShadowQuality(1);
+	raytracer->SetMultisampling(1);
+	raytracer->SetReflectionBlur(1);
+   raytracer->SetOcclusion(0);
 }
 
 void cleanupScene()
@@ -142,13 +142,18 @@ void outputImage(const char *filename = "out.bmp")
 
 void test()
 {
-   Color v1(1.0f, 2.0f, -0.5f);
-   Color v2(0.0f, 1.0f, 0.0f);
-   printf("(%0.1f, %0.1f, %0.1f)\n", v1.rv(), v1.gv(), v1.bv());
-   printf("(%0.1f, %0.1f, %0.1f)\n", v2.rv(), v2.gv(), v2.bv());
+   Vector v1(1, 2, 3);
+   v1.array[0] = 4;
+   Vector v2(5, 6, 7);
+   v2.array[0] = 8;
 
-   Color x = v1 + v2;
-   printf("(%0.1f, %0.1f, %0.1f)\n", x.rv(), x.gv(), x.bv());
+   printf("[%0.1f, %0.1f, %0.1f, %0.1f]\n", v1.array[0], v1.array[1], v1.array[2], v1.array[3]);
+   printf("[%0.1f, %0.1f, %0.1f, %0.1f]\n", v2.array[0], v2.array[1], v2.array[2], v2.array[3]);
+
+   __m128 mv = _mm_addsub_ps(v1.v, v2.v);
+   mv = _mm_shuffle_ps(mv, mv, _MM_SHUFFLE(0, 0, 0, 0));
+   Vector m(mv);
+   printf("[%0.1f, %0.1f, %0.1f, %0.1f]\n", m.array[0], m.array[1], m.array[2], m.array[3]);
 }
 
 int main(int argc, char* argv[])

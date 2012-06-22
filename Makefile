@@ -7,7 +7,7 @@ SSE_FLAGS=
 SSE_FILES=color.o vector.o
 
 ifndef DISABLE_SSE
-	SSE_FLAGS += -msse4 -mfpmath=sse -DSSE2_ENABLE
+	SSE_FLAGS += -mssse3 -mfpmath=sse -DSSE2_ENABLE
 	SSE_FILES = color_sse.o vector_sse.o
 endif
 CFLAGS += $(SSE_FLAGS)

@@ -90,7 +90,7 @@ void Vector::operator *=(float f)
 
 void Vector::operator /=(float f)
 {
-	__m128 vf = _mm_load1_ps(&f);
+	__m128 vf = _mm_set1_ps(f);
 	v = _mm_div_ps(v, vf);
 }
 
