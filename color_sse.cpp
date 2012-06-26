@@ -2,151 +2,142 @@
 #include "main.h"
 
 //constructor and destructor
-Color::Color(float red, float green, float blue) : r(red), g(green), b(blue), a(0.0f)
+Color::Color(float red, float green, float blue)
 {
+   c = _mm_set_ps(red, green, blue, 0.0f);
 }
 
 Color::Color(float *ca)
 {
-	__m128 c = _mm_loadu_ps(ca);
-	_mm_storeu_ps(array, c);
-	a = 0.0f;
+   c = _mm_set_ps(ca[0], ca[1], ca[2], 0.0f);
 }
 
-Color::Color(__m128 c)
+Color::Color(__m128 ic)
 {
-	_mm_storeu_ps(array, c);
-	a = 0.0f;
+   c = ic;
 }
 
 Color::~Color(void)
 {
 }
 
-//operators
-Color Color::operator *(const Color &c) const
+
+//accessors
+
+float Color::rv() const
 {
-	__m128 c1 = _mm_loadu_ps(array);
-	__m128 c2 = _mm_loadu_ps(c.array);
-	return Color(_mm_mul_ps(c1, c2));
+   return array[3];
 }
 
-void Color::operator *=(const Color &c)
+float Color::gv() const
 {
-	__m128 c1 = _mm_loadu_ps(array);
-	__m128 c2 = _mm_loadu_ps(c.array);
-	__m128 res = _mm_mul_ps(c1, c2);
-	_mm_storeu_ps(array, res);
+   return array[2];
+}
+
+float Color::bv() const
+{
+   return array[1];
+}
+
+float Color::av() const
+{
+   return array[0];
+}
+
+
+//operators
+Color Color::operator *(const Color &ic) const
+{
+	return Color(_mm_mul_ps(c, ic.c));
+}
+
+void Color::operator *=(const Color &ic)
+{
+	c = _mm_mul_ps(c, ic.c);
 }
 
 Color Color::operator *(const float f) const
 {
-	__m128 c1 = _mm_loadu_ps(array);
-	__m128 c2 = _mm_load1_ps(&f);
-	return Color(_mm_mul_ps(c1, c2));
+	__m128 cf = _mm_set1_ps(f);
+	return Color(_mm_mul_ps(c, cf));
 }
 
 void Color::operator *=(const float f)
 {
-	__m128 c1 = _mm_loadu_ps(array);
-	__m128 c2 = _mm_load1_ps(&f);
-	__m128 res = _mm_mul_ps(c1, c2);
-	_mm_storeu_ps(array, res);
+	__m128 cf = _mm_set1_ps(f);
+	c = _mm_mul_ps(c, cf);
 }
 
-Color operator *(const float f, const Color &c)
+Color operator *(const float f, const Color &ic)
 {
-	__m128 c1 = _mm_loadu_ps(c.array);
-	__m128 c2 = _mm_load1_ps(&f);
-	return Color(_mm_mul_ps(c1, c2));
+	__m128 cf = _mm_set1_ps(f);
+	return Color(_mm_mul_ps(ic.c, cf));
 }
 
-Color Color::operator +(const Color &c) const
+Color Color::operator +(const Color &ic) const
 {
-	__m128 c1 = _mm_loadu_ps(array);
-	__m128 c2 = _mm_loadu_ps(c.array);
-	return Color(_mm_add_ps(c1, c2));
+	return Color(_mm_add_ps(c, ic.c));
 }
 
-void Color::operator +=(const Color &c)
+void Color::operator +=(const Color &ic)
 {
-	__m128 c1 = _mm_loadu_ps(array);
-	__m128 c2 = _mm_loadu_ps(c.array);
-	__m128 res = _mm_add_ps(c1, c2);
-	_mm_storeu_ps(array, res);
+	c = _mm_add_ps(c, ic.c);
 }
 
-Color Color::operator -(const Color &c) const
+Color Color::operator -(const Color &ic) const
 {
-	__m128 c1 = _mm_loadu_ps(array);
-	__m128 c2 = _mm_loadu_ps(c.array);
-	return Color(_mm_sub_ps(c1, c2));
+	return Color(_mm_sub_ps(c, ic.c));
 }
 
-void Color::operator -=(const Color &c)
+void Color::operator -=(const Color &ic)
 {
-	__m128 c1 = _mm_loadu_ps(array);
-	__m128 c2 = _mm_loadu_ps(c.array);
-	__m128 res = _mm_sub_ps(c1, c2);
-	_mm_storeu_ps(array, res);
+	c = _mm_sub_ps(c, ic.c);
 }
 
-Color Color::operator /(const Color &c) const
+Color Color::operator /(const Color &ic) const
 {
-	__m128 c1 = _mm_loadu_ps(array);
-	__m128 c2 = _mm_loadu_ps(c.array);
-	return Color(_mm_div_ps(c1, c2));
+	return Color(_mm_div_ps(c, ic.c));
 }
 
 Color Color::operator /(const float f) const
 {
-	__m128 c1 = _mm_loadu_ps(array);
-	__m128 c2 = _mm_load1_ps(&f);
-	return Color(_mm_sub_ps(c1, c2));
+	__m128 cf = _mm_set1_ps(f);
+	return Color(_mm_sub_ps(c, cf));
 }
 
-Color operator /(const float f, const Color &c)
+Color operator /(const float f, const Color &ic)
 {
-	__m128 c1 = _mm_loadu_ps(c.array);
-	__m128 c2 = _mm_load1_ps(&f);
-	return Color(_mm_sub_ps(c1, c2));
+	__m128 cf = _mm_set1_ps(f);
+	return Color(_mm_sub_ps(ic.c, cf));
 }
 
-void Color::operator /=(const Color &c)
+void Color::operator /=(const Color &ic)
 {
-	__m128 c1 = _mm_loadu_ps(array);
-	__m128 c2 = _mm_load1_ps(c.array);
-	__m128 res = _mm_div_ps(c1, c2);
-	_mm_storeu_ps(array, res);
+	c = _mm_div_ps(c, ic.c);
 }
 
 void Color::operator /=(const float f)
 {
-	__m128 c1 = _mm_loadu_ps(array);
-	__m128 c2 = _mm_load1_ps(&f);
-	__m128 res = _mm_div_ps(c1, c2);
-	_mm_storeu_ps(array, res);
+	__m128 cf = _mm_set1_ps(f);
+	c = _mm_div_ps(c, cf);
 }
 
 Color Color::ClampLower(float f)
 {
-	__m128 c = _mm_loadu_ps(array);
-	__m128 val = _mm_load1_ps(&f);
+	__m128 val = _mm_set1_ps(f);
 	__m128 res = _mm_max_ps(c, val);
 
 	return Color(res);
 }
 Color Color::ClampUpper(float f)
 {
-	__m128 c = _mm_loadu_ps(array);
-	__m128 val = _mm_load1_ps(&f);
+	__m128 val = _mm_set1_ps(f);
 	__m128 res = _mm_min_ps(c, val);
 
 	return Color(res);
 }
 Color Color::ClampNormal(void)
 {
-	__m128 c = _mm_loadu_ps(array);
 	__m128 zero = _mm_set1_ps(0.0f);
 	__m128 one = _mm_set1_ps(1.0f);
 	__m128 res = _mm_max_ps(c, zero);
@@ -157,10 +148,29 @@ Color Color::ClampNormal(void)
 
 int Color::ToInt(void)
 {
-	int red = lrintf(r * 255.0f);
-	int green = lrintf(g * 255.0f);
-	int blue = lrintf(b * 255.0f);
+   __m128 mul = _mm_set1_ps(255.0f);
+   mul = _mm_mul_ps(c, mul);
+   __m128i ints = _mm_cvttps_epi32(mul);
+   int red = reinterpret_cast<integer_vector_access&>(ints).array[3];
+   int green = reinterpret_cast<integer_vector_access&>(ints).array[2];
+   int blue = reinterpret_cast<integer_vector_access&>(ints).array[1];
 	return ((red << 16) + (green << 8) + blue);
+}
+
+RGBApixel Color::ToRGBAPixel(void)
+{
+   __m128 mul = _mm_set1_ps(255.0f);
+   mul = _mm_mul_ps(c, mul);
+   __m128i ints = _mm_cvttps_epi32(mul);
+   int red = reinterpret_cast<integer_vector_access&>(ints).array[3];
+   int green = reinterpret_cast<integer_vector_access&>(ints).array[2];
+   int blue = reinterpret_cast<integer_vector_access&>(ints).array[1];
+   RGBApixel p;
+   p.Red = red;
+   p.Green = green;
+   p.Blue = blue;
+   p.Alpha = 255;
+   return p;
 }
 
 //static colors

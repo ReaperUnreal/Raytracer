@@ -6,12 +6,22 @@
 #include <memory.h>
 #include <string>
 #include <stdio.h>
+#include <vector>
 #ifdef OMP_ENABLE
    #include <omp.h>
 #endif
 #ifdef SSE2_ENABLE
-   #include <xmmintrin.h>
-   #include <intrin.h>
+   #ifdef __linux__
+      #include <immintrin.h>
+      //#ifdef __SSE4_1__
+         //#include <smmintrin.h>
+      //#else
+         //#include <tmmintrin.h>
+      //#endif
+   #else
+      #include <intrin.h>
+      #include <xmmintrin.h>
+   #endif
 #endif
 #ifdef __linux__
    #include <sys/time.h>
@@ -19,12 +29,14 @@
 #endif
 #include "EasyBMP.h"
 
+using namespace std;
+
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const float PI = 3.14159265358979323846264338327950288419716939937511f; //lol, 50 digits!
 const float TWOPI = PI * 2.0f;
 const float PIBYTWO = PI * 0.5f;
-const float EPSILON = 0.00001f;
+const float EPSILON = 0.0001f;
 const float MAX_RAND_DIVIDER = 1.0f / RAND_MAX;
 
 inline bool FloatEquals(float a, float b)
@@ -80,12 +92,21 @@ inline unsigned int CreateColor(int r, int g, int b)
 }
 
 #ifdef SSE2_ENABLE
-	#include "color_sse.h"
-	#include "vector_sse.h"
-#else
-	#include "color.h"
-	#include "vector.h"
+typedef union vu
+{
+   __m128 v;
+   float array[4];
+} vector_access;
+
+typedef union ivu
+{
+   __m128i v;
+   int array[4];
+} integer_vector_access;
 #endif
+
+#include "color.h"
+#include "vector.h"
 #include "rendersurface.h"
 #include "ray.h"
 #include "camera.h"

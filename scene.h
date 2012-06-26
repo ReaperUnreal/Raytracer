@@ -10,18 +10,14 @@ public:
 	~Scene(void);
 
 	int AddObject(Geometry *object);
-	void RemoveObject(Geometry *object);
-	Geometry* RemoveObjectAt(int index);
-	void Clear(void);
-	void DeleteAll(void);
+   void DeleteAll();
 
 	Geometry* GetObjectAt(int index);
-	Geometry** GetObjects(void);
-	int GetNumObjects(void) const;
+   vector<Geometry *>& GetObjects();
+	int GetNumObjects() const;
 private:
 	int numObjects;
-	int capacity;
-	Geometry **objects;
+   vector<Geometry *> objects;
 };
 
 #endif

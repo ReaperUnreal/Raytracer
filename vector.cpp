@@ -1,4 +1,3 @@
-#ifndef SSE2_ENABLE
 #include "main.h"
 
 //constructor and destructor
@@ -10,6 +9,22 @@ Vector::~Vector(void)
 {
 }
 
+//the accessors
+float Vector::xv() const
+{
+   return x;
+}
+
+float Vector::yv() const
+{
+   return y;
+}
+
+float Vector::zv() const
+{
+   return z;
+}
+
 //the operators
 Vector Vector::operator +(const Vector &v) const
 {
@@ -19,6 +34,11 @@ Vector Vector::operator +(const Vector &v) const
 Vector Vector::operator -(const Vector &v) const
 {
 	return Vector(x - v.x, y - v.y, z - v.z);
+}
+
+Vector Vector::operator *(const Vector &v) const
+{
+   return Vector(x * v.x, y * v.y, z * v.z);
 }
 
 Vector Vector::operator *(float f) const
@@ -77,6 +97,13 @@ void Vector::operator -=(const Vector &v)
 	z -= v.z;
 }
 
+void Vector::operator *=(const Vector &v)
+{
+   x *= v.x;
+   y *= v.y;
+   z *= v.z;
+}
+
 float Vector::Length(void) const
 {
 	return sqrtf(x * x + y * y + z * z);
@@ -130,4 +157,47 @@ void Vector::Normalize(Vector &v)
 {
 	v.Normalize();
 }
-#endif
+
+Vector Vector::Min(const Vector &v1, const Vector &v2)
+{
+   Vector m(v1);
+   if(v2.x < m.x)
+      m.x = v2.x;
+   if(v2.y < m.y)
+      m.y = v2.y;
+   if(v2.z < m.z)
+      m.z = v2.z;
+   return m;
+}
+
+Vector Vector::Max(const Vector &v1, const Vector &v2)
+{
+   Vector m(v1);
+   if(v2.x > m.x)
+      m.x = v2.x;
+   if(v2.y > m.y)
+      m.y = v2.y;
+   if(v2.z > m.z)
+      m.z = v2.z;
+   return m;
+}
+
+Vector Vector::Reciprocal() const
+{
+   return Vector(1.0f / x, 1.0f / y, 1.0f / z);
+}
+
+Vector Vector::Reciprocal(const Vector &v)
+{
+   return Vector(1.0f / v.x, 1.0f / v.y, 1.0f / v.z);
+}
+
+Vector Vector::Abs() const
+{
+   return Vector(fabsf(x), fabsf(y), fabsf(z));
+}
+
+Vector Vector::Abs(const Vector &v)
+{
+   return Vector(fabsf(v.x), fabsf(v.y), fabsf(v.z));
+}

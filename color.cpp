@@ -1,4 +1,3 @@
-#ifndef SSE2_ENABLE
 #include "main.h"
 
 //constructor and destructor
@@ -8,6 +7,28 @@ Color::Color(float red, float green, float blue) : r(red), g(green), b(blue)
 
 Color::~Color(void)
 {
+}
+
+//accessors
+
+float Color::rv() const
+{
+   return r;
+}
+
+float Color::gv() const
+{
+   return g;
+}
+
+float Color::bv() const
+{
+   return b;
+}
+
+float Color::av() const
+{
+   return 1.0f;
 }
 
 //operators
@@ -166,4 +187,3 @@ const Color Color::blue  =     Color(0.0f, 0.0f, 1.0f);
 const Color Color::yellow =    Color(1.0f, 1.0f, 0.0f);
 const Color Color::turquoise = Color(0.0f, 1.0f, 1.0f);
 const Color Color::purple =    Color(1.0f, 0.0f, 1.0f);
-#endif

@@ -199,7 +199,7 @@ Vector Plane::GeneratePoint() const
 {
 	float x = ((20.0f * lrflti(rand())) * MAX_RAND_DIVIDER) - 10.0f;
 	float y = ((20.0f * lrflti(rand())) * MAX_RAND_DIVIDER) - 10.0f;
-	float z = -((normal.x * x + normal.y * y + d) / normal.z);
+	float z = -((normal.xv() * x + normal.yv() * y + d) / normal.zv());
 	return Vector(x, y, z);
 }
 
@@ -251,6 +251,57 @@ Vector Sphere::GetNormal(Vector &pos) const
 
 int Sphere::Intersect(Ray &r, float &mindist) const
 {
+#ifdef SSE2_ENABLE
+   static const __m128 SIGNMASK = _mm_castsi128_ps(_mm_set1_epi32(0x80000000));
+   __m128 v = _mm_sub_ps(r.origin.v, position.v);
+   #ifdef __SSE4_1__
+      __m128 b = _mm_dp_ps(v, r.direction.v, 0xEF);
+   #else
+      __m128 b = _mm_mul_ps(v, r.direction.v);
+      b = _mm_hadd_ps(b, b);
+      b = _mm_hadd_ps(b, b);
+   #endif
+   __m128 b2 = _mm_mul_ps(b, b);
+   #ifdef __SSE4_1__
+      __m128 vmag2 = _mm_dp_ps(v, v, 0xEF);
+   #else
+      __m128 vmag2 = _mm_mul_ps(v, v);
+      vmag2 = _mm_hadd_ps(vmag2, vmag2);
+      vmag2 = _mm_hadd_ps(vmag2, vmag2);
+   #endif
+   __m128 r2 = _mm_set1_ps(sqrRadius);
+   b = _mm_xor_ps(b, SIGNMASK); //wait until the last second to negate b
+
+   __m128 det = _mm_sub_ps(b2, vmag2);
+   det = _mm_add_ps(det, r2); //determinant is now in all slots of the vector
+   int retval = MISS;
+   if(_mm_comigt_ss(det, _mm_setzero_ps()))
+   {
+      det = _mm_sqrt_ps(det);
+      __m128 i2v = _mm_add_ps(b, det); //addsub would just be stupid
+      if(_mm_comigt_ss(i2v, _mm_setzero_ps()))
+      {
+         __m128 i1v = _mm_sub_ps(b, det);
+         __m128 minv = _mm_set1_ps(mindist);
+         if(_mm_comilt_ss(i1v, _mm_setzero_ps()))
+         {
+            if(_mm_comilt_ss(i2v, minv))
+            {
+               mindist = reinterpret_cast<vector_access&>(i2v).array[0];
+               retval = INPRIM;
+            }
+         }
+         else
+         {
+            if(_mm_comilt_ss(i1v, minv))
+            {
+               mindist = reinterpret_cast<vector_access&>(i1v).array[0];
+               retval = HIT;
+            }
+         }
+      }
+   }
+#else
 	Vector v = r.origin - position;
 	float b = -v.Dot(r.direction);
 	float det = (b * b) - v.Dot(v) + sqrRadius;
@@ -258,10 +309,10 @@ int Sphere::Intersect(Ray &r, float &mindist) const
 	if(det > 0)
 	{
 		det = sqrtf(det);
-		float i1 = b - det;
 		float i2 = b + det;
 		if(i2 > 0)
 		{
+         float i1 = b - det;
 			if(i1 < 0)
 			{
 				if(i2 < mindist)
@@ -280,6 +331,7 @@ int Sphere::Intersect(Ray &r, float &mindist) const
 			}
 		}
 	}
+#endif
 	return retval;
 }
 
@@ -322,6 +374,152 @@ int Sphere::GetIntersectionPoints(Ray &r, float &d1, float &d2) const
 		return MISS;
 	}
 	return MISS;
+}
+
+//the Axis Aligned Box class
+AABox::AABox(const Vector &min, const Vector &max)
+{
+   //ensure min and max before storing
+   bounds[0] = Vector::Min(min, max);
+   bounds[1] = Vector::Max(min, max);
+}
+
+AABox::~AABox(void)
+{
+}
+
+Vector AABox::GetMin() const
+{
+   return bounds[0];
+}
+
+Vector AABox::GetMax() const
+{
+   return bounds[1];
+}
+
+int AABox::GetType() const
+{
+   return AABOX;
+}
+
+int AABox::Intersect(Ray &r, float &mindist) const
+{
+   //smits' method
+   float tmin, tmax, tymin, tymax, tzmin, tzmax;
+   Vector invdir = r.direction.Reciprocal();
+
+   float dirx = r.direction.xv();
+   float invdirx = invdir.xv();
+   if(dirx >= 0)
+   {
+      tmin = (bounds[0].xv() - r.origin.xv()) * invdirx;
+      tmax = (bounds[1].xv() - r.origin.xv()) * invdirx;
+   }
+   else
+   {
+      tmin = (bounds[1].xv() - r.origin.xv()) * invdirx;
+      tmax = (bounds[0].xv() - r.origin.xv()) * invdirx;
+   }
+   float diry = r.direction.yv();
+   float invdiry = invdir.yv();
+   if(diry >= 0)
+   {
+      tymin = (bounds[0].yv() - r.origin.yv()) * invdiry;
+      tymax = (bounds[1].yv() - r.origin.yv()) * invdiry;
+   }
+   else
+   {
+      tymin = (bounds[1].yv() - r.origin.yv()) * invdiry;
+      tymax = (bounds[0].yv() - r.origin.yv()) * invdiry;
+   }
+
+   if((tmin > tymax) || (tymin > tmax))
+      return MISS;
+
+   if(tymin > tmin)
+      tmin = tymin;
+   if(tymax < tmax)
+      tmax = tymax;
+
+   float dirz = r.direction.zv();
+   float invdirz = invdir.zv();
+   if(dirz >= 0)
+   {
+      tzmin = (bounds[0].zv() - r.origin.zv()) * invdirz;
+      tzmax = (bounds[1].zv() - r.origin.zv()) * invdirz;
+   }
+   else
+   {
+      tzmin = (bounds[1].zv() - r.origin.zv()) * invdirz;
+      tzmax = (bounds[0].zv() - r.origin.zv()) * invdirz;
+   }
+
+   if((tmin > tzmax) || (tzmin > tmax))
+      return MISS;
+
+   if(tzmin > tmin)
+      tmin = tzmin;
+   if(tzmax < tmax)
+      tmax = tzmax;
+
+   if((tmin < mindist) && (tmax > 0))
+   {
+      mindist = tmin;
+      return HIT;
+   }
+
+   return MISS;
+}
+
+Vector AABox::GetNormal(Vector &pos) const
+{
+   Vector mind = Vector::Abs(pos - bounds[0]);
+   Vector maxd = Vector::Abs(pos - bounds[1]);
+
+   float vals[6] = {mind.xv(), mind.yv(), mind.zv(), maxd.xv(), maxd.yv(), maxd.zv()};
+   float min = vals[0];
+   int mini = 0;
+   for(int i = 1; i < 6; i++)
+   {
+      if(vals[i] < min)
+      {
+         min = vals[i];
+         mini = i;
+      }
+   }
+
+   switch(mini)
+   {
+      case 0:
+         return Vector(-1, 0, 0);
+      case 1:
+         return Vector(0, -1, 0);
+      case 2:
+         return Vector(0, 0, -1);
+      case 3:
+         return Vector(1, 0, 0);
+      case 4:
+         return Vector(0, 1, 0);
+      case 5:
+         return Vector(0, 0, 1);
+      default: break;
+   }
+
+   return Vector(1, 0, 0);
+}
+
+Vector AABox::GeneratePoint() const
+{
+   float xw = lrflti(rand()) * MAX_RAND_DIVIDER;
+   float yw = lrflti(rand()) * MAX_RAND_DIVIDER;
+   float zw = lrflti(rand()) * MAX_RAND_DIVIDER;
+   Vector weights(xw, yw, zw);
+
+   Vector res = (bounds[1] - bounds[0]) * weights;
+   res += bounds[0];
+
+   return res;
 }
 
 //the Metaball class
@@ -371,20 +569,26 @@ Sphere Metaball::GetBounds(void) const
 		for(int i = 1; i < numBalls; i++)
 		{
 			//mins
+         min = Vector::Min(balls[i]->GetPosition(), min);
+         /*
 			if(balls[i]->GetPosition().x < min.x)
 				min.x = balls[i]->GetPosition().x;
 			if(balls[i]->GetPosition().y < min.y)
 				min.y = balls[i]->GetPosition().y;
 			if(balls[i]->GetPosition().z < min.z)
 				min.z = balls[i]->GetPosition().z;
+         */
 
 			//max
+         max = Vector::Max(balls[i]->GetPosition(), max);
+         /*
 			if(balls[i]->GetPosition().x > max.x)
 				max.x = balls[i]->GetPosition().x;
 			if(balls[i]->GetPosition().y > max.y)
 				max.y = balls[i]->GetPosition().y;
 			if(balls[i]->GetPosition().z > max.z)
 				max.z = balls[i]->GetPosition().z;
+         */
 		}
 		Vector line = max - min;
 		float dist = line.Length();

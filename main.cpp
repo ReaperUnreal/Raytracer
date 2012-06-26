@@ -24,13 +24,14 @@ void setupScene()
 	sphere->GetMaterial().SetDiffuse(1.0f);
 	sphere->GetMaterial().SetSpecular(0.0f);
 	sphere->GetMaterial().SetReflectivity(0.0f);
-	scene->AddObject(sphere);
+   scene->AddObject(sphere);
 
 	Sphere *smaller = new Sphere(Vector(2.0f, -1.5f, 1.3f), 0.5f);
-	smaller->GetMaterial().SetColor(Color::blue);
-	smaller->GetMaterial().SetDiffuse(1.0f);
+	smaller->GetMaterial().SetColor(Color::white);
+	smaller->GetMaterial().SetDiffuse(0.0f);
 	smaller->GetMaterial().SetSpecular(0.0f);
-	//scene->AddObject(smaller);
+   smaller->GetMaterial().SetReflectivity(1.0f);
+   scene->AddObject(smaller);
 
 	Sphere *another = new Sphere(Vector(6.0f, -1.0f, -4.0f), 1.0f);
 	another->GetMaterial().SetColor(Color::red);
@@ -53,22 +54,22 @@ void setupScene()
 	Plane *floor = new Plane(Vector(0.0f, 1.0f, 0.0f), 2.0f);
 	floor->GetMaterial().SetColor(Color::white);
 	floor->GetMaterial().SetDiffuse(1.0f);
-	scene->AddObject(floor);
+   //scene->AddObject(floor);
 
 	Plane *wall = new Plane(Vector(0.0f, 0.0f, 1.0f), 6.0f);
 	wall->GetMaterial().SetColor(Color::white);
 	wall->GetMaterial().SetDiffuse(1.0f);
-	scene->AddObject(wall);
+   //scene->AddObject(wall);
 
 	Plane *wall2 = new Plane(Vector(1.0f, 0.0f, 0.0f), 6.0f);
 	wall2->GetMaterial().SetColor(Color::red);
 	wall2->GetMaterial().SetDiffuse(1.0f);
-	scene->AddObject(wall2);
+   //scene->AddObject(wall2);
 
 	Plane *wall3 = new Plane(Vector(-1.0f, 0.0f, 0.0f), 6.0f);
 	wall3->GetMaterial().SetColor(Color::blue);
 	wall3->GetMaterial().SetDiffuse(1.0f);
-	scene->AddObject(wall3);
+   //scene->AddObject(wall3);
 
 	Sphere **sphereList = new Sphere*[3];
 	sphereList[0] = new Sphere(Vector(-1.0f, 0.0f, 0.0f), 0.5f);
@@ -82,18 +83,38 @@ void setupScene()
 	metaball->GetMaterial().SetReflectivity(0.0f);
 	//scene->AddObject(metaball);
 
+   AABox *floorbox = new AABox(Vector(-6.0f, -2.5f, -6.0f), Vector(6.0f, -2.0f, 6.0f));
+   floorbox->GetMaterial().SetColor(Color::white);
+   floorbox->GetMaterial().SetDiffuse(1.0f);
+   scene->AddObject(floorbox);
+
+   AABox *wallbox1 = new AABox(Vector(-6.0f, -2.0f, -6.5f), Vector(6.0f, 6.0f, -6.0f));
+   wallbox1->GetMaterial().SetColor(Color::white);
+   wallbox1->GetMaterial().SetDiffuse(1.0f);
+   scene->AddObject(wallbox1);
+
+   AABox *wallbox2 = new AABox(Vector(-6.5f, -2.0f, -6.0f), Vector(-6.0f, 6.0f, 6.0f));
+   wallbox2->GetMaterial().SetColor(Color::red);
+   wallbox2->GetMaterial().SetDiffuse(1.0f);
+   scene->AddObject(wallbox2);
+
+   AABox *wallbox3 = new AABox(Vector(6.0f, -2.0f, -6.0f), Vector(6.5f, 6.0f, 6.0f));
+   wallbox3->GetMaterial().SetColor(Color::blue);
+   wallbox3->GetMaterial().SetDiffuse(1.0f);
+   scene->AddObject(wallbox3);
+
 	raytracer->SetScene(scene);
 
 	//unthinkable without multithreading
-	raytracer->SetShadowQuality(4);
-	raytracer->SetMultisampling(1);
+	raytracer->SetShadowQuality(16);
+	raytracer->SetMultisampling(8);
 	raytracer->SetReflectionBlur(1);
-	raytracer->SetOcclusion(0);
+   raytracer->SetOcclusion(32);
 }
 
 void cleanupScene()
 {
-	scene->DeleteAll();
+   scene->DeleteAll();
 
 	delete scene;
 	delete target;
@@ -119,8 +140,27 @@ void outputImage(const char *filename = "out.bmp")
    out.WriteToFile(filename);
 }
 
+void test()
+{
+   Vector v1(1, 2, 3);
+   v1.array[0] = 4;
+   Vector v2(5, 6, 7);
+   v2.array[0] = 8;
+
+   printf("[%0.1f, %0.1f, %0.1f, %0.1f]\n", v1.array[0], v1.array[1], v1.array[2], v1.array[3]);
+   printf("[%0.1f, %0.1f, %0.1f, %0.1f]\n", v2.array[0], v2.array[1], v2.array[2], v2.array[3]);
+
+   __m128 mv = _mm_addsub_ps(v1.v, v2.v);
+   mv = _mm_shuffle_ps(mv, mv, _MM_SHUFFLE(0, 0, 0, 0));
+   Vector m(mv);
+   printf("[%0.1f, %0.1f, %0.1f, %0.1f]\n", m.array[0], m.array[1], m.array[2], m.array[3]);
+}
+
 int main(int argc, char* argv[])
 {
+   //test();
+   //return 0;
+
    //setup the scene
    printf("Setup...\n");
 	setupScene();
@@ -149,4 +189,7 @@ int main(int argc, char* argv[])
 	//cleanup everything
    printf("Cleanup\n");
 	cleanupScene();
+
+
+   return 0;
 }
