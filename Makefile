@@ -18,8 +18,8 @@ all: $(EXECUTABLE)
 debug: CFLAGS+=-g
 debug: $(EXECUTABLE)
 
-$(EXECUTABLE): camera.o EasyBMP.o geometry.o main.o ray.o raytracer.o rendersurface.o scene.o $(SSE_FILES)
-	$(CC) $(LFLAGS) camera.o EasyBMP.o geometry.o main.o ray.o raytracer.o rendersurface.o scene.o $(SSE_FILES) -o $(EXECUTABLE)
+$(EXECUTABLE): camera.o EasyBMP.o geometry.o main.o progress.o ray.o raytracer.o rendersurface.o scene.o $(SSE_FILES)
+	$(CC) $(LFLAGS) camera.o EasyBMP.o geometry.o main.o progress.o ray.o raytracer.o rendersurface.o scene.o $(SSE_FILES) -o $(EXECUTABLE)
 
 camera.o: camera.cpp
 	$(CC) $(CFLAGS) camera.cpp
@@ -38,6 +38,9 @@ geometry.o: geometry.cpp
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
+
+progress.o: progress.cpp
+	$(CC) $(CFLAGS) progress.cpp
 
 ray.o: ray.cpp
 	$(CC) $(CFLAGS) ray.cpp

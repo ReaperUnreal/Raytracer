@@ -5,6 +5,7 @@ Raytracer::Raytracer(void)
 	rs = NULL;
 	cam = NULL;
 	sc = NULL;
+   pu = NULL;
 	shadowQuality = 1;
 	reflectionBlur = 1;
 	multisampling = 1;
@@ -13,6 +14,11 @@ Raytracer::Raytracer(void)
 
 Raytracer::~Raytracer(void)
 {
+   if(pu)
+   {
+      delete pu;
+      pu = NULL;
+   }
 }
 
 
@@ -44,6 +50,35 @@ void Raytracer::SetScene(Scene *scene)
 Scene* Raytracer::GetScene(void)
 {
 	return sc;
+}
+
+void Raytracer::SetProgressUpdater(ProgressUpdater *progress)
+{
+   pu = progress;
+}
+
+void Raytracer::SetProgress(float p)
+{
+   if(pu)
+   {
+      pu->Update(p);
+   }
+}
+
+void Raytracer::InitProgress()
+{
+   if(pu)
+   {
+      pu->Init();
+   }
+}
+
+void Raytracer::FinishProgress()
+{
+   if(pu)
+   {
+      pu->Finish();
+   }
 }
 
 void Raytracer::SetShadowQuality(int quality)
@@ -354,6 +389,7 @@ void Raytracer::Render(void)
 	Color pixel;
 	Geometry *geom = NULL;
 	float dist = 0.0f;
+   InitProgress();
 
 	//render each line in parallel
 	int y, x, s;
@@ -386,6 +422,11 @@ void Raytracer::Render(void)
 
 			//update the pixel color
 			surface[y * width + x] = accumulator * divider;
+         
+         //update the progression
+         SetProgress(static_cast<float>(y * width + x) / static_cast<float>(width * height));
 		}
 	}
+
+   FinishProgress();
 }

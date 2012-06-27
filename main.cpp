@@ -50,6 +50,8 @@ void setupScene()
 	target = new RenderSurface(SCREEN_WIDTH, SCREEN_HEIGHT);
 	raytracer->SetTarget(target);
 
+   raytracer->SetProgressUpdater(new PercentMonitor());
+
 	scene = new Scene(8);
 
    SDFScene *sdf = new SDFScene();

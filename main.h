@@ -123,6 +123,7 @@ typedef union ivu
 #include "camera.h"
 #include "geometry.h"
 #include "scene.h"
+#include "progress.h"
 #include "raytracer.h"
 
 #endif
