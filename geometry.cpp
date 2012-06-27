@@ -717,7 +717,7 @@ Vector Metaball::GeneratePoint(void) const
 
 
 //the Signed Distance Function class
-SDF::SDF() : threshold(0.001f), iterations(64)
+SDF::SDF() : threshold(0.001f), iterations(1024)
 {
 }
 
@@ -783,7 +783,7 @@ int SDF::Intersect(Ray &r, float &mindist) const
          return HIT;
       }
       t += d;
-      //i++;
+      i++;
    }
 
    return MISS;

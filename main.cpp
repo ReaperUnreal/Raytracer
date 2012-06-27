@@ -147,10 +147,10 @@ void setupScene()
 	raytracer->SetScene(scene);
 
 	//unthinkable without multithreading
-	raytracer->SetShadowQuality(16);
-	raytracer->SetMultisampling(1);
+	raytracer->SetShadowQuality(64);
+	raytracer->SetMultisampling(16);
 	raytracer->SetReflectionBlur(1);
-   raytracer->SetOcclusion(0);
+   raytracer->SetOcclusion(128);
 }
 
 void cleanupScene()

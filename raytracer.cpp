@@ -291,7 +291,14 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 				}
 
 				intersected = false;
-				ambientRay.origin = intersection + sampleDir * EPSILON;
+            if(geom->GetType() == Geometry::SDFUNC)
+            {
+               ambientRay.origin = intersection + N * (10.0f * EPSILON);
+            }
+            else
+            {
+               ambientRay.origin = intersection + sampleDir * EPSILON;
+            }
 				ambientRay.direction = sampleDir;
 				ambdist = MAXDEPTH;
             vector<Geometry *> &aov = sc->GetObjects();
