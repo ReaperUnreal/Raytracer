@@ -25,6 +25,8 @@ public:
 	Camera* GetCamera(void);
 	void SetScene(Scene *scene);
 	Scene* GetScene(void);
+   void SetProgressUpdater(ProgressUpdater *progress);
+   void SetProgress(float p);
 	void SetShadowQuality(int quality);
 	int GetShadowQuality(void);
 	void SetReflectionBlur(int blur);
@@ -40,6 +42,7 @@ private:
 	RenderSurface *rs;
 	Camera *cam;
 	Scene *sc;
+   ProgressUpdater *pu;
 	int shadowQuality;
 	int reflectionBlur;
 	int multisampling;
