@@ -189,7 +189,7 @@ public:
    void SetIterations(int i);
    int GetIterations() const;
 protected:
-   float distance(Vector &p) const;
+   virtual float distance(Vector &p) const;
 
 private:
    float threshold;

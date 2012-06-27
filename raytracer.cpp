@@ -94,7 +94,7 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 {
 	if(depth > TRACEDEPTH)
 		return NULL;
-	dist = 1000000.0f;
+	dist = MAX_DIST;
 	Vector intersection, L, N, V, R, sampleDir, samplePos;
 	Geometry *geom = NULL;
 	int result = 0;
@@ -144,7 +144,15 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 				if(shadowQuality == 1)
 				{
 					shade = 1.0f;
-					shadow.origin = intersection + L * EPSILON;
+               if(geom->GetType() == Geometry::SDFUNC)
+               {
+                  N = geom->GetNormal(intersection);
+                  shadow.origin = intersection + N * (10.0f * EPSILON);
+               }
+               else
+               {
+                  shadow.origin = intersection + L * EPSILON;
+               }
 					shadow.direction = L;
                vector<Geometry *> &sov = sc->GetObjects();
                for(vector<Geometry *>::iterator sit = sov.begin(); sit != sov.end(); sit++)

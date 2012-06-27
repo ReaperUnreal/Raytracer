@@ -717,11 +717,11 @@ Vector Metaball::GeneratePoint(void) const
 
 
 //the Signed Distance Function class
-SDF::SDF() : threshold(0.01f), iterations(16)
+SDF::SDF() : threshold(0.001f), iterations(64)
 {
 }
 
-virtual SDF::~SDF()
+SDF::~SDF()
 {
 }
 
@@ -747,33 +747,57 @@ int SDF::GetIterations() const
 
 Vector SDF::GetNormal(Vector &pos) const
 {
-   return Vector(); //FIX ME
+   //Gradient method, use (v-e)-(v+e)
+   Vector vxp = pos + Vector(EPSILON, 0, 0);
+   Vector vyp = pos + Vector(0, EPSILON, 0);
+   Vector vzp = pos + Vector(0, 0, EPSILON);
+   Vector vxn = pos - Vector(EPSILON, 0, 0);
+   Vector vyn = pos - Vector(0, EPSILON, 0);
+   Vector vzn = pos - Vector(0, 0, EPSILON);
+   float dxp = distance(vxp);
+   float dyp = distance(vyp);
+   float dzp = distance(vzp);
+   float dxn = distance(vxn);
+   float dyn = distance(vyn);
+   float dzn = distance(vzn);
+   Vector n(dxp - dxn, dyp - dyn, dzp - dzn);
+   n.Normalize();
+   return n;
 }
 
 int SDF::Intersect(Ray &r, float &mindist) const
 {
-   Vector p = r.origin;
-   float d = distance(p);
-
-   for(int i = 0; i < iterations; i++)
+   int i = 0;
+   float t = 0;
+   while((t < mindist) && (i < iterations))
    {
-      if(d < threshold)
+      Vector p = r.origin + (r.direction * t);
+      float d = distance(p);
+      if(d < EPSILON)
       {
-         mindist = 
+         i++;
       }
-      p = r.origin + (d * r.direction);
+      if(fabsf(d) < threshold)
+      {
+         mindist = t;
+         return HIT;
+      }
+      t += d;
+      //i++;
    }
+
+   return MISS;
 }
 
-int SDF::GetType()
+int SDF::GetType() const
 {
    return SDFUNC;
 }
 
 Vector SDF::GeneratePoint() const
 {
-   //TODO: This is going to be hard, maybe pick a random point and try to iterate up to 5 times or so, and if it doesn't come close, pick another point
-   // maybe up to 5 points?
+   //choose random point and direction, then raymarch in that direction until intersect
+   return Vector(); //FIX ME
 }
 
 float SDF::distance(Vector &pos) const
