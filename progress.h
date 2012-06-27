@@ -26,4 +26,18 @@ protected:
    float prev_p;
 };
 
+class PercentMonitor : public ProgressUpdater
+{
+public:
+   PercentMonitor();
+   virtual ~PercentMonitor();
+
+   virtual void Update(float p);
+   virtual void Init();
+   virtual void Finish();
+
+protected:
+   float prev_p;
+};
+
 #endif //PROGRESS_H
