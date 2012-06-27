@@ -7,7 +7,7 @@ RenderSurface *target;
 
 class SDFScene : public SDF
 {
-protected:
+public:
    virtual float distance(Vector &pos) const
    {
       //just a sphere
@@ -147,10 +147,10 @@ void setupScene()
 	raytracer->SetScene(scene);
 
 	//unthinkable without multithreading
-	raytracer->SetShadowQuality(64);
-	raytracer->SetMultisampling(16);
+	raytracer->SetShadowQuality(1);
+	raytracer->SetMultisampling(1);
 	raytracer->SetReflectionBlur(1);
-   raytracer->SetOcclusion(128);
+   raytracer->SetOcclusion(4);
 }
 
 void cleanupScene()

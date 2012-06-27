@@ -267,55 +267,87 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 		//calculate ambient lighting
 		if(occlusion > 0)
 		{
-			//initialize the ambient light
-			ambient = 0.0f;
-			float invsamples = 1.0f / lrflti(occlusion);
-			float u, v, sqrtv, angle, ambdist;
-			bool intersected;
-			Vector sampleDir;
+         //setup needed for both types of AO
+         ambient = 0.0f;
+         float invsamples = 1.0f / lrflti(occlusion);
 
-			//shoot out cosine weighted rays
-			for(int i = 0; i < occlusion; i++)
-			{
-				u = lrflti(rand()) * MAX_RAND_DIVIDER * TWOPI;
-				v = lrflti(rand()) * MAX_RAND_DIVIDER;
-				sqrtv = sqrtf(v);
-				sampleDir =  Vector(cosf(u) * sqrtv, sinf(u) * sqrtv, sqrtf(1.0f - v));
-
-				N = geom->GetNormal(intersection);
-				angle = N.Dot(sampleDir);
-				if(angle < 0)
-				{
-					sampleDir *= -1.0f;
-					angle = -angle;
-				}
-
-				intersected = false;
-            if(geom->GetType() == Geometry::SDFUNC)
+         //we can use really fake and fast AO for SDFs
+         if(geom->GetType() == Geometry::SDFUNC)
+         {
+            //from Rendering Worlds With Two Triangles paper
+            //ao = 1 - k * sum(1, 5, 1/(2^i) * (pink(i) - yellow(i)));
+            // pink(i) = distance from intersection point to sample point along the normal
+            //         = delta * i
+            // yellow(i) = distance from sample point to surface
+            //           = distfield(intersection + delta * i * n)
+            N = geom->GetNormal(intersection);
+            SDF *sdf = reinterpret_cast<SDF *>(geom);
+            float sum = 0.0f;
+            float k = 0.5f; // magic number for choosing overall strength of AO
+            float scale = 1.0f;
+            float delta = 0.01f; // magic number for sample distances
+            for(int i = 1; i <= occlusion; i++)
             {
-               ambientRay.origin = intersection + N * (10.0f * EPSILON);
-            }
-            else
-            {
-               ambientRay.origin = intersection + sampleDir * EPSILON;
-            }
-				ambientRay.direction = sampleDir;
-				ambdist = MAXDEPTH;
-            vector<Geometry *> &aov = sc->GetObjects();
-            for(vector<Geometry *>::iterator aoit = aov.begin(); aoit != aov.end(); aoit++)
-				{
-					if((!(*aoit)->IsLight()) && ((*aoit)->Intersect(ambientRay, ambdist)))
-					{
-						intersected = true;
-						break;
-					}
-				}
+               scale *= 0.5f;
+               float pink = delta * static_cast<float>(i);
+               
+               Vector sample = intersection + (N * pink);
+               float yellow = sdf->distance(sample);
 
-				if(!intersected)
-				{
-					ambient += invsamples * angle;
-				}
-			}
+               sum += scale * (pink - yellow); //note that pink >= yellow since the intersection point is the furthest possible you could go
+            }
+            ambient = 1.0f - (k * sum);
+         }
+         else
+         {
+            //initialize the ambient light
+            float u, v, sqrtv, angle, ambdist;
+            bool intersected;
+            Vector sampleDir;
+
+            //shoot out cosine weighted rays
+            for(int i = 0; i < occlusion; i++)
+            {
+               u = lrflti(rand()) * MAX_RAND_DIVIDER * TWOPI;
+               v = lrflti(rand()) * MAX_RAND_DIVIDER;
+               sqrtv = sqrtf(v);
+               sampleDir =  Vector(cosf(u) * sqrtv, sinf(u) * sqrtv, sqrtf(1.0f - v));
+
+               N = geom->GetNormal(intersection);
+               angle = N.Dot(sampleDir);
+               if(angle < 0)
+               {
+                  sampleDir *= -1.0f;
+                  angle = -angle;
+               }
+
+               intersected = false;
+               if(geom->GetType() == Geometry::SDFUNC)
+               {
+                  ambientRay.origin = intersection + N * (10.0f * EPSILON);
+               }
+               else
+               {
+                  ambientRay.origin = intersection + sampleDir * EPSILON;
+               }
+               ambientRay.direction = sampleDir;
+               ambdist = MAXDEPTH;
+               vector<Geometry *> &aov = sc->GetObjects();
+               for(vector<Geometry *>::iterator aoit = aov.begin(); aoit != aov.end(); aoit++)
+               {
+                  if((!(*aoit)->IsLight()) && ((*aoit)->Intersect(ambientRay, ambdist)))
+                  {
+                     intersected = true;
+                     break;
+                  }
+               }
+
+               if(!intersected)
+               {
+                  ambient += invsamples * angle;
+               }
+            }
+         }
 
          col += geom->GetMaterial().GetColor() * geom->GetMaterial().GetDiffuse() * ambient;
 		}

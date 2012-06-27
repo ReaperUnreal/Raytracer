@@ -188,7 +188,7 @@ public:
    float GetThreshold() const;
    void SetIterations(int i);
    int GetIterations() const;
-protected:
+
    virtual float distance(Vector &p) const;
 
 private:
