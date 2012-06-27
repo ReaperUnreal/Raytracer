@@ -27,6 +27,8 @@ public:
 	Scene* GetScene(void);
    void SetProgressUpdater(ProgressUpdater *progress);
    void SetProgress(float p);
+   void InitProgress();
+   void FinishProgress();
 	void SetShadowQuality(int quality);
 	int GetShadowQuality(void);
 	void SetReflectionBlur(int blur);

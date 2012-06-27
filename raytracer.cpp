@@ -14,6 +14,11 @@ Raytracer::Raytracer(void)
 
 Raytracer::~Raytracer(void)
 {
+   if(pu)
+   {
+      delete pu;
+      pu = NULL;
+   }
 }
 
 
@@ -57,6 +62,22 @@ void Raytracer::SetProgress(float p)
    if(pu)
    {
       pu->Update(p);
+   }
+}
+
+void Raytracer::InitProgress()
+{
+   if(pu)
+   {
+      pu->Init();
+   }
+}
+
+void Raytracer::FinishProgress()
+{
+   if(pu)
+   {
+      pu->Finish();
    }
 }
 
@@ -360,6 +381,7 @@ void Raytracer::Render(void)
 	Color pixel;
 	Geometry *geom = NULL;
 	float dist = 0.0f;
+   InitProgress();
 
 	//render each line in parallel
 	int y, x, s;
@@ -397,4 +419,6 @@ void Raytracer::Render(void)
          SetProgress(static_cast<float>(y * width + x) / static_cast<float>(width * height));
 		}
 	}
+
+   FinishProgress();
 }

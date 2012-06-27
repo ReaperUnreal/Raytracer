@@ -17,6 +17,8 @@ void setupScene()
 	target = new RenderSurface(SCREEN_WIDTH, SCREEN_HEIGHT);
 	raytracer->SetTarget(target);
 
+   raytracer->SetProgressUpdater(new CoarseMonitor());
+
 	scene = new Scene(8);
 
 	Sphere *sphere = new Sphere(Vector(0, 0, 0), 2.0f);
@@ -107,9 +109,9 @@ void setupScene()
 
 	//unthinkable without multithreading
 	raytracer->SetShadowQuality(16);
-	raytracer->SetMultisampling(8);
+	raytracer->SetMultisampling(1);
 	raytracer->SetReflectionBlur(1);
-   raytracer->SetOcclusion(32);
+   raytracer->SetOcclusion(0);
 }
 
 void cleanupScene()
