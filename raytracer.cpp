@@ -175,19 +175,21 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 				ldist = L.Length();
 				L /= ldist;
 
+            if(geom->GetType() == Geometry::SDFUNC)
+            {
+               N = geom->GetNormal(intersection);
+               shadow.origin = intersection + N * (10.0f * EPSILON);
+            }
+            else
+            {
+               shadow.origin = intersection + L * EPSILON;
+            }
+
 				//shadow
 				if(shadowQuality == 1)
 				{
 					shade = 1.0f;
-               if(geom->GetType() == Geometry::SDFUNC)
-               {
-                  N = geom->GetNormal(intersection);
-                  shadow.origin = intersection + N * (10.0f * EPSILON);
-               }
-               else
-               {
-                  shadow.origin = intersection + L * EPSILON;
-               }
+               
 					shadow.direction = L;
                vector<Geometry *> &sov = sc->GetObjects();
                for(vector<Geometry *>::iterator sit = sov.begin(); sit != sov.end(); sit++)
@@ -202,7 +204,6 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 				else
 				{
 					shade = 0.0f;
-					shadow.origin = intersection + L * EPSILON;
 					int i;
 					//apparently parallel shadows slows it down
 					//#pragma omp parallel for default(none) shared(light, intersection, ldist, numItems, step) private(i, inShade, tempdist, shadowObj, s) firstprivate(shadow) reduction(+:shade) schedule(dynamic, 1)
