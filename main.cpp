@@ -38,6 +38,58 @@ public:
    }
 };
 
+class SDFMetaball : public SDF
+{
+public:
+   float c(const float r2) const
+   {
+      //if r < R
+      //2r^3/R^3 - 3r^2/R^2 + 1
+      //R = 2
+      // => 1/4r^3 - 3/4r^2 + 1
+
+      if(r2 >= 4.0f)
+         return 0.0f;
+
+      float r = sqrtf(r2);
+      float r3 = r2 * r;
+      return (0.25f * r3) - (0.75f * r2) + 1;
+   }
+
+   float f(const Vector &x) const
+   {
+      // the 3 points
+      static const Vector v1(-1.0f, 0.0f, 0.0f);
+      static const Vector v2(1.0f, 0.0f, 0.0f);
+      static const Vector v3(0.0f, sqrtf(3.0f), 0.0f);
+
+      //f = T - sum(c(||x - pi||))
+      float r1 = (x - v1).SqrLength();
+      float r2 = (x - v2).SqrLength();
+      float r3 = (x - v3).SqrLength();
+
+      float sum = c(r1) + c(r2) + c(r3);
+
+      return 0.005f - sum;
+   }
+
+   virtual float distance(Vector &pos) const
+   {
+      //d(x, B) >= 2/3 * f(x) * sum(Ri)
+      //Ri = 2
+      //d(x, B) >= 2/3 * 6 * f(x)
+      //d(x, B) >= 4 * f(x)
+
+      float bd =  4.0f * f(pos);
+
+      //the floor plane
+      static const Vector normal(0, 1, 0);
+      float fd = pos.Dot(normal) + 2.0f;
+
+      return fmin(bd, fd);
+   }
+};
+
 void setupScene()
 {
 	raytracer = new Raytracer();
@@ -54,7 +106,8 @@ void setupScene()
 
 	scene = new Scene(8);
 
-   SDFScene *sdf = new SDFScene();
+   //SDFScene *sdf = new SDFScene();
+   SDFMetaball *sdf = new SDFMetaball();
    sdf->GetMaterial().SetColor(Color::white);
    sdf->GetMaterial().SetDiffuse(1.0f);
 	sdf->GetMaterial().SetSpecular(0.0f);
@@ -148,7 +201,7 @@ void setupScene()
 
 	//unthinkable without multithreading
 	raytracer->SetShadowQuality(256);
-	raytracer->SetMultisampling(32);
+	raytracer->SetMultisampling(64);
 	raytracer->SetReflectionBlur(1);
    raytracer->SetOcclusion(10);
 }
