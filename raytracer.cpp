@@ -283,9 +283,9 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
             N = geom->GetNormal(intersection);
             SDF *sdf = reinterpret_cast<SDF *>(geom);
             float sum = 0.0f;
-            float k = 0.5f; // magic number for choosing overall strength of AO
+            float k = 0.3f; // magic number for choosing overall strength of AO
             float scale = 1.0f;
-            float delta = 0.01f; // magic number for sample distances
+            float delta = 0.1f; // magic number for sample distances
             for(int i = 1; i <= occlusion; i++)
             {
                scale *= 0.5f;
@@ -294,9 +294,9 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
                Vector sample = intersection + (N * pink);
                float yellow = sdf->distance(sample);
 
-               sum += scale * (pink - yellow); //note that pink >= yellow since the intersection point is the furthest possible you could go
+               sum += scale * fmax(pink - yellow, 0.0f); //note that pink >= yellow since the intersection point is the furthest possible you could go
             }
-            ambient = 1.0f - (k * sum);
+            ambient = k * (1.0f - sum);
          }
          else
          {
