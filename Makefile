@@ -6,6 +6,10 @@ EASY_BMP_CFLAGS=-c -fopenmp -O3 -march=core2 -mrecip
 SSE_FLAGS=
 SSE_FILES=color.o vector.o
 
+ifdef DISABLE_JITTER
+   CFLAGS+=-DDISABLE_JITTER
+endif
+
 ifndef DISABLE_SSE
 	SSE_FLAGS += -msse4 -mfpmath=sse -DSSE2_ENABLE
 	SSE_FILES = color_sse.o vector_sse.o

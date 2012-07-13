@@ -450,9 +450,13 @@ void Raytracer::Render(void)
 				//clear out the pixel
 				pixel = Color::black;
 				//create the ray
+#ifdef DISABLE_JITTER
+            dir = screenpos - offset;
+#else
             u = lrflti(rand()) * MAX_RAND_DIVIDER;
             v = lrflti(rand()) * MAX_RAND_DIVIDER;
 				dir = screenpos - offset + (dx * u) + (dy * v);
+#endif
 				dir = dir / dir.Length();
 				r.direction = dir;
 				//trace the actual ray
