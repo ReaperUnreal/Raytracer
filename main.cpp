@@ -81,12 +81,21 @@ public:
       //d(x, B) >= 4 * f(x)
 
       float bd =  4.0f * f(pos);
+      float d = bd;
+
+      //cylinder
+      Vector cp(pos.xv(), pos.yv(), 0.0f);
+      float cd = cp.Length() - 1.0f;
+
+      //d = fmax(-cd, bd);
 
       //the floor plane
       static const Vector normal(0, 1, 0);
       float fd = pos.Dot(normal) + 2.0f;
 
-      return fmin(bd, fd);
+      d = fmin(d, fd);
+
+      return d;
    }
 };
 
@@ -200,10 +209,10 @@ void setupScene()
 	raytracer->SetScene(scene);
 
 	//unthinkable without multithreading
-	raytracer->SetShadowQuality(256);
-	raytracer->SetMultisampling(64);
+	raytracer->SetShadowQuality(1);
+	raytracer->SetMultisampling(1);
 	raytracer->SetReflectionBlur(1);
-   raytracer->SetOcclusion(10);
+   raytracer->SetOcclusion(0);
 }
 
 void cleanupScene()
