@@ -747,13 +747,17 @@ int SDF::GetIterations() const
 
 Vector SDF::GetNormal(Vector &pos) const
 {
+   static const Vector vxe(EPSILON, 0, 0);
+   static const Vector vye(0, EPSILON, 0);
+   static const Vector vze(0, 0, EPSILON);
+
    //Gradient method, use (v-e)-(v+e)
-   Vector vxp = pos + Vector(EPSILON, 0, 0);
-   Vector vyp = pos + Vector(0, EPSILON, 0);
-   Vector vzp = pos + Vector(0, 0, EPSILON);
-   Vector vxn = pos - Vector(EPSILON, 0, 0);
-   Vector vyn = pos - Vector(0, EPSILON, 0);
-   Vector vzn = pos - Vector(0, 0, EPSILON);
+   Vector vxp = pos + vxe;
+   Vector vyp = pos + vye;
+   Vector vzp = pos + vze;
+   Vector vxn = pos - vxe;
+   Vector vyn = pos - vye;
+   Vector vzn = pos - vze;
    float dxp = distance(vxp);
    float dyp = distance(vyp);
    float dzp = distance(vzp);

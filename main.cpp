@@ -14,7 +14,7 @@ public:
       float sd = pos.Length() - 1.5f;
 
       //the floor plane
-      Vector normal(0, 1, 0);
+      static const Vector normal(0, 1, 0);
       float fd = pos.Dot(normal) + 2.0f;
 
       //cylinder
