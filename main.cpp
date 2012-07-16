@@ -245,18 +245,16 @@ void outputImage(const char *filename = "out.bmp")
 
 void test()
 {
-   Vector v1(1, 2, 3);
-   v1.array[0] = 4;
-   Vector v2(5, 6, 7);
-   v2.array[0] = 8;
+   Vector v1(2.5f, 4.5f, -1.5f);
+   //v1.array[0] = 4;
+   Vector v2(2.0f, 2.0f, 2.0f);
 
    printf("[%0.1f, %0.1f, %0.1f, %0.1f]\n", v1.array[0], v1.array[1], v1.array[2], v1.array[3]);
    printf("[%0.1f, %0.1f, %0.1f, %0.1f]\n", v2.array[0], v2.array[1], v2.array[2], v2.array[3]);
 
-   __m128 mv = _mm_addsub_ps(v1.v, v2.v);
-   mv = _mm_shuffle_ps(mv, mv, _MM_SHUFFLE(0, 0, 0, 0));
-   Vector m(mv);
-   printf("[%0.1f, %0.1f, %0.1f, %0.1f]\n", m.array[0], m.array[1], m.array[2], m.array[3]);
+   Vector v = Vector::Mod(v1, v2);
+
+   printf("[%0.1f, %0.1f, %0.1f, %0.1f]\n", v.array[0], v.array[1], v.array[2], v.array[3]);
 }
 
 void test2()

@@ -109,6 +109,22 @@ float Vector::Length(void) const
 	return sqrtf(x * x + y * y + z * z);
 }
 
+float Vector::LengthN(int n) const
+{
+   float powx = x;
+   float powy = y;
+   float powz = z;
+   float invpow = 1.0f / static_cast<float>(n);
+   for(int i = 1; i < n; i++)
+   {
+      powx *= x;
+      powy *= y;
+      powz *= z;
+   }
+   float sum = powx + powy + powz;
+   return powf(sum, invpow);
+}
+
 float Vector::SqrLength(void) const
 {
 	return x * x + y * y + z * z;
@@ -136,6 +152,22 @@ void Vector::Normalize(void)
 float Vector::Length(const Vector &v)
 {
 	return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+float Vector::LengthN(const Vector &v, int n)
+{
+   float powx = v.x;
+   float powy = v.y;
+   float powz = v.z;
+   float invpow = 1.0f / static_cast<float>(n);
+   for(int i = 1; i < n; i++)
+   {
+      powx *= v.x;
+      powy *= v.y;
+      powz *= v.z;
+   }
+   float sum = powx + powy + powz;
+   return powf(sum, invpow);
 }
 
 float Vector::SqrLength(const Vector &v)
@@ -200,4 +232,22 @@ Vector Vector::Abs() const
 Vector Vector::Abs(const Vector &v)
 {
    return Vector(fabsf(v.x), fabsf(v.y), fabsf(v.z));
+}
+
+float Vector::MaxComp() const
+{
+   return fmax(fmax(x, y), z);
+}
+
+float Vector::MaxComp(const Vector &v)
+{
+   return fmax(fmax(v.x, v.y), v.z);
+}
+
+Vector Vector::Mod(const Vector &v, const Vector &c)
+{
+   float x = fmod(v.x, c.x);
+   float y = fmod(v.y, c.y);
+   float z = fmod(v.z, c.z);
+   return Vector(x, y, z);
 }

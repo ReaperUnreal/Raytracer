@@ -808,3 +808,143 @@ float SDF::distance(Vector &pos) const
 {
    return 0.0f; //always hit?
 }
+
+Vector SDF::translate(const Vector &p, const Vector &t) const
+{
+   return p + t;
+}
+
+Vector SDF::rotateX(const Vector &p, float theta) const
+{
+   theta = -theta;
+   float ct = cosf(theta);
+   float st = sinf(theta);
+   float x = p.xv();
+   float y = p.yv();
+   float z = p.zv();
+   Vector pr(x, (y * ct) - (z * st), (y * st) + (z * ct));
+   return pr;
+}
+
+Vector SDF::rotateY(const Vector &p, float theta) const
+{
+   theta = -theta;
+   float ct = cosf(theta);
+   float st = sinf(theta);
+   float x = p.xv();
+   float y = p.yv();
+   float z = p.zv();
+   Vector pr((x * ct) - (z * st), y, (x * st) + (z * ct));
+   return pr;
+}
+
+Vector SDF::rotateZ(const Vector &p, float theta) const
+{
+   theta = -theta;
+   float ct = cosf(theta);
+   float st = sinf(theta);
+   float x = p.xv();
+   float y = p.yv();
+   float z = p.zv();
+   Vector pr((x * ct) - (y * st), (x * st) + (y * ct), z);
+   return pr;
+}
+
+float SDF::sphere(const Vector &p, float r) const
+{
+   return p.Length() - r;
+}
+
+float SDF::box(const Vector &p, const Vector &b) const
+{
+   static const Vector zero(0.0f, 0.0f, 0.0f);
+
+   Vector d = p.Abs() - b;
+   float maxc = d.MaxComp();
+   float len = Vector::Max(d, zero).Length();
+   return fmin(maxc, len);
+}
+
+float SDF::cylinderxy(const Vector &p, float r) const
+{
+   Vector cp(p.xv(), p.yv(), 0.0f);
+   float cd = cp.Length() - 1.0f;
+   return cd;
+}
+
+float SDF::cylinderxz(const Vector &p, float r) const
+{
+   Vector cp(p.xv(), 0.0f, p.zv());
+   float cd = cp.Length() - 1.0f;
+   return cd;
+}
+
+float SDF::cylinderyz(const Vector &p, float r) const
+{
+   Vector cp(0.0f, p.yv(), p.zv());
+   float cd = cp.Length() - 1.0f;
+   return cd;
+}
+
+float SDF::cylinder(const Vector &p, const Vector &c) const
+{
+   Vector cp(p.xv(), p.zv(), 0.0f);
+   Vector cc(c.xv(), c.yv(), 0.0f);
+   float cd = Vector::Length(cp - cc);
+   return cd - c.zv();
+}
+
+float SDF::plane(const Vector &p, const Vector &n, float d) const
+{
+   float dot = p.Dot(n);
+   return dot - d;
+}
+
+float SDF::torus(const Vector &p, float major, float minor) const
+{
+   Vector txz(p.xv(), 0.0f, p.zv());
+   float xz = txz.Length();
+   Vector ty(xz - major, p.yv(), 0.0f);
+   float td = ty.Length() - minor;
+   return td;
+}
+
+float SDF::torus82(const Vector &p, float major, float minor) const
+{
+   Vector txz(p.xv(), 0.0f, p.zv());
+   float xz = txz.Length();
+   Vector ty(xz - major, p.yv(), 0.0f);
+   float td = ty.LengthN(8) - minor;
+   return td;
+}
+
+float SDF::torus88(const Vector &p, float major, float minor) const
+{
+   Vector txz(p.xv(), 0.0f, p.zv());
+   float xz = txz.LengthN(8);
+   Vector ty(xz - major, p.yv(), 0.0f);
+   float td = ty.LengthN(8) - minor;
+   return td;
+}
+
+float SDF::opUnion(float d1, float d2) const
+{
+   return fmin(d1, d2);
+}
+
+float SDF::opSubtract(float d1, float d2) const
+{
+   return fmax(d1, -d2);
+}
+
+float SDF::opIntersect(float d1, float d2) const
+{
+   return fmax(d1, d2);
+}
+
+Vector SDF::repeat(const Vector &p, const Vector &c) const
+{
+   Vector q = Vector::Mod(p, c) - (c * 0.5f);
+   return q;
+}
+

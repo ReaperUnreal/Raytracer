@@ -123,6 +123,20 @@ float Vector::Length(void) const
 	//return sqrtf(x * x + y * y + z * z);
 }
 
+float Vector::LengthN(int n) const
+{
+   __m128 accum = v;
+   for(int i = 1; i < n; i++)
+      accum = _mm_mul_ps(accum, v);
+   __m128 sum = _mm_hadd_ps(accum, accum);
+   sum = _mm_hadd_ps(sum, sum);
+
+   float res = reinterpret_cast<vector_access&>(sum).array[0];
+   float invpow = 1.0f / static_cast<float>(n);
+   res = powf(res, invpow);
+   return res;
+}
+
 float Vector::SqrLength(void) const
 {
 #ifdef __SSE4_1__
@@ -191,6 +205,20 @@ float Vector::Length(const Vector &iv)
 	res = _mm_sqrt_ss(res);
 	return reinterpret_cast<vector_access&>(res).array[0];
 	//return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+float Vector::LengthN(const Vector &iv, int n)
+{
+   __m128 accum = iv.v;
+   for(int i = 1; i < n; i++)
+      accum = _mm_mul_ps(accum, iv.v);
+   __m128 sum = _mm_hadd_ps(accum, accum);
+   sum = _mm_hadd_ps(sum, sum);
+
+   float res = reinterpret_cast<vector_access&>(sum).array[0];
+   float invpow = 1.0f / static_cast<float>(n);
+   res = powf(res, invpow);
+   return res;
 }
 
 float Vector::SqrLength(const Vector &iv)
@@ -274,4 +302,41 @@ Vector Vector::Abs(const Vector &v)
    static const __m128 SIGNMASK = _mm_castsi128_ps(_mm_set1_epi32(0x80000000));
    __m128 res = _mm_andnot_ps(SIGNMASK, v.v);
    return Vector(res);
+}
+
+float Vector::MaxComp() const
+{
+   __m128 ytop = _mm_shuffle_ps(v, v, _MM_SHUFFLE(2, 2, 2, 2));
+   __m128 ztop = _mm_shuffle_ps(v, v, _MM_SHUFFLE(1, 1, 1, 1));
+   __m128 res = _mm_max_ps(_mm_max_ps(v, ytop), ztop);
+   return reinterpret_cast<vector_access&>(res).array[3];
+}
+
+float Vector::MaxComp(const Vector &v)
+{
+   __m128 ytop = _mm_shuffle_ps(v.v, v.v, _MM_SHUFFLE(2, 2, 2, 2));
+   __m128 ztop = _mm_shuffle_ps(v.v, v.v, _MM_SHUFFLE(1, 1, 1, 1));
+   __m128 res = _mm_max_ps(_mm_max_ps(v.v, ytop), ztop);
+   return reinterpret_cast<vector_access&>(res).array[3];
+}
+
+Vector Vector::Mod(const Vector &v, const Vector &c)
+{
+   __m128 div = v.v / c.v;
+#ifdef __SSE4_1__
+   div = _mm_round_ps(div, _MM_FROUND_TO_ZERO);
+#else
+   static const __m128i SIGNMASK = _mm_set1_epi32(0x80000000);
+
+   __m128i ints = _mm_cvttps_epi32(div);
+   __m128 truncs = _mm_cvtepi32_ps(ints);
+
+   __m128 flags = _mm_castsi128_ps(_mm_cmpeq_epi32(ints, SIGNMASK));
+   __m128 res1 = _mm_and_ps(flags, div);
+   __m128 res2 = _mm_andnot_ps(flags, truncs);
+   div = _mm_or_ps(res1, res2);
+#endif
+   __m128 mul = _mm_mul_ps(c.v, div);
+   __m128 mod = _mm_sub_ps(v.v, mul);
+   return Vector(mod);
 }

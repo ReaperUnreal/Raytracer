@@ -191,6 +191,27 @@ public:
 
    virtual float distance(Vector &p) const;
 
+   Vector translate(const Vector &p, const Vector &t) const;
+   Vector rotateX(const Vector &p, float theta) const;
+   Vector rotateY(const Vector &p, float theta) const;
+   Vector rotateZ(const Vector &p, float theta) const;
+   Vector repeat(const Vector &p, const Vector &c) const;
+
+   float sphere(const Vector &p, float r) const;
+   float box(const Vector &p, const Vector &b) const;
+   float cylinderxy(const Vector &p, float r) const; //xy cylinder
+   float cylinderxz(const Vector &p, float r) const; //xz cylinder
+   float cylinderyz(const Vector &p, float r) const; //yz cylinder
+   float cylinder(const Vector &p, const Vector &c) const; //general cylinder from IQ
+   float plane(const Vector &p, const Vector &n, float d) const;
+   float torus(const Vector &p, float major, float minor) const;
+   float torus82(const Vector &p, float major, float minor) const;
+   float torus88(const Vector &p, float major, float minor) const;
+
+   float opUnion(float d1, float d2) const;
+   float opSubtract(float d1, float d2) const;
+   float opIntersect(float d1, float d2) const;
+
 private:
    float threshold;
    int iterations;

@@ -36,15 +36,18 @@ public:
 	
 	//other functions
 	float Length(void) const;
+	float LengthN(int n) const;
 	float SqrLength(void) const;
 	float Dot(const Vector &iv) const;
 	Vector Cross(const Vector &iv) const;
 	void Normalize(void);
    Vector Reciprocal(void) const;
    Vector Abs(void) const;
+   float MaxComp(void) const;
 
 
 	static float Length(const Vector &iv);
+	static float LengthN(const Vector &iv, int n);
 	static float SqrLength(const Vector &iv);
 	static float Dot(const Vector &v1, const Vector &v2);
 	static Vector Cross(const Vector &v1, const Vector &v2);
@@ -53,6 +56,8 @@ public:
    static Vector Max(const Vector &v1, const Vector &v2);
    static Vector Reciprocal(const Vector &v);
    static Vector Abs(const Vector &v);
+   static float MaxComp(const Vector &v);
+   static Vector Mod(const Vector &v, const Vector &c);
 
 	//memory
 #ifdef SSE2_ENABLE
