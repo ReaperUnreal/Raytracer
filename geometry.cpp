@@ -275,62 +275,55 @@ int Sphere::Intersect(Ray &r, float &mindist) const
    __m128 det = _mm_sub_ps(b2, vmag2);
    det = _mm_add_ps(det, r2); //determinant is now in all slots of the vector
    int retval = MISS;
-   if(_mm_comigt_ss(det, _mm_setzero_ps()))
+   if(!_mm_comigt_ss(det, _mm_setzero_ps())) {
+      return retval;
+   }
+   det = _mm_sqrt_ps(det);
+   __m128 i2v = _mm_add_ps(b, det); //addsub would just be stupid
+   if(!_mm_comigt_ss(i2v, _mm_setzero_ps())) {
+      return retval;
+   }
+   __m128 i1v = _mm_sub_ps(b, det);
+   __m128 minv = _mm_set1_ps(mindist);
+   bool zomg = static_cast<bool>(_mm_comilt_ss(i1v, _mm_setzero_ps()));
+   __m128 lulz = zomg ? i2v : 1iv;
+   if(_mm_comilt_ss(lulz, minv))
    {
-      det = _mm_sqrt_ps(det);
-      __m128 i2v = _mm_add_ps(b, det); //addsub would just be stupid
-      if(_mm_comigt_ss(i2v, _mm_setzero_ps()))
-      {
-         __m128 i1v = _mm_sub_ps(b, det);
-         __m128 minv = _mm_set1_ps(mindist);
-         if(_mm_comilt_ss(i1v, _mm_setzero_ps()))
-         {
-            if(_mm_comilt_ss(i2v, minv))
-            {
-               mindist = reinterpret_cast<vector_access&>(i2v).array[0];
-               retval = INPRIM;
-            }
-         }
-         else
-         {
-            if(_mm_comilt_ss(i1v, minv))
-            {
-               mindist = reinterpret_cast<vector_access&>(i1v).array[0];
-               retval = HIT;
-            }
-         }
-      }
+      mindist = reinterpret_cast<vector_access&>(lulz).array[0];
+      retval = zomg ? INPRIM : HIT;
    }
 #else
 	Vector v = r.origin - position;
 	float b = -v.Dot(r.direction);
 	float det = (b * b) - v.Dot(v) + sqrRadius;
 	int retval = MISS;
-	if(det > 0)
-	{
-		det = sqrtf(det);
-		float i2 = b + det;
-		if(i2 > 0)
-		{
-         float i1 = b - det;
-			if(i1 < 0)
-			{
-				if(i2 < mindist)
-				{
-					mindist = i2;
-					retval = INPRIM;
-				}
-			}
-			else
-			{
-				if(i1 < mindist)
-				{
-					mindist = i1;
-					retval = HIT;
-				}
-			}
-		}
-	}
+   if (det <= 0) {
+      return retval;
+   }
+
+   det = sqrtf(det);
+   float i2 = b + det;
+   if(i2 <= 0) {
+      return retval
+   }
+
+   float i1 = b - det;
+   if(i1 < 0)
+   {
+      if(i2 < mindist)
+      {
+         mindist = i2;
+         retval = INPRIM;
+      }
+   }
+   else
+   {
+      if(i1 < mindist)
+      {
+         mindist = i1;
+         retval = HIT;
+      }
+   }
 #endif
 	return retval;
 }

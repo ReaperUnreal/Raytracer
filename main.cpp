@@ -87,7 +87,15 @@ public:
       Vector cp(pos.xv(), pos.yv(), 0.0f);
       float cd = cp.Length() - 1.0f;
 
-      //d = fmax(-cd, bd);
+      d = fmax(-cd, d);
+
+      //torus
+      Vector txz(pos.xv(), 0.0f, pos.zv());
+      float xz = txz.Length() - 1.0f;
+      Vector ty(xz, pos.yv() + 1.0f, 0.0f);
+      float td = ty.Length() - 0.8f;
+
+      d = fmax(-td, d);
 
       //the floor plane
       static const Vector normal(0, 1, 0);
@@ -209,10 +217,10 @@ void setupScene()
 	raytracer->SetScene(scene);
 
 	//unthinkable without multithreading
-	raytracer->SetShadowQuality(1);
-	raytracer->SetMultisampling(1);
+	raytracer->SetShadowQuality(256);
+	raytracer->SetMultisampling(64);
 	raytracer->SetReflectionBlur(1);
-   raytracer->SetOcclusion(0);
+   raytracer->SetOcclusion(10);
 }
 
 void cleanupScene()
