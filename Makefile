@@ -11,7 +11,7 @@ ifdef DISABLE_JITTER
 endif
 
 ifndef DISABLE_SSE
-	SSE_FLAGS += -mssse3 -mfpmath=sse -DSSE2_ENABLE
+	SSE_FLAGS += -msse4 -mfpmath=sse -DSSE2_ENABLE
 	SSE_FILES = color_sse.o vector_sse.o
 endif
 CFLAGS += $(SSE_FLAGS)

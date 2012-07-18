@@ -38,6 +38,30 @@ public:
    }
 };
 
+class SDFScene2 : public SDF
+{
+public:
+   virtual float distance(Vector &pos) const
+   {
+      float sd = sphere(pos, 1.5f);
+
+      static const Vector normal(0, 1, 0);
+      float fd = plane(pos, normal, -2.0f);
+
+      float cd = cylinderxz(pos, 1.0f);
+
+      Vector tpos = translate(pos, Vector(0, 1, 0));
+      float td = torus(tpos, 1.0f, 0.5f);
+
+      float d = opSubtract(cd, sd);
+      d = opUnion(td, d);
+      //d = opIntersect(td, d);
+      d = opUnion(fd, d);
+
+      return d;
+   }
+};
+
 class SDFMetaball : public SDF
 {
 public:
@@ -116,7 +140,7 @@ void setupScene()
 	scene = new Scene(8);
 
    //SDFScene *sdf = new SDFScene();
-   SDFMetaball *sdf = new SDFMetaball();
+   SDFScene2 *sdf = new SDFScene2();
    sdf->GetMaterial().SetColor(Color::white);
    sdf->GetMaterial().SetDiffuse(1.0f);
 	sdf->GetMaterial().SetSpecular(0.0f);
