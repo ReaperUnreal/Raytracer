@@ -43,20 +43,27 @@ class SDFScene2 : public SDF
 public:
    virtual float distance(Vector &pos) const
    {
-      float sd = sphere(pos, 1.5f);
+      static const Vector spherePos(-1.5f, 1.5f, 0);
+      float sd = sphere(translate(pos, spherePos), 1.23f);
 
       static const Vector normal(0, 1, 0);
       float fd = plane(pos, normal, -2.0f);
 
-      float cd = cylinderxz(pos, 1.0f);
+      static const Vector boxSize(1, 1, 1);
+      static const Vector boxPos(-1.5f, 1.5f, 0);
+      float bd = box(translate(pos, boxPos), boxSize);
 
-      Vector tpos = translate(pos, Vector(0, 1, 0));
-      float td = torus(tpos, 1.0f, 0.5f);
+      static const Vector torusPos(1.0f, 0, 0);
+      float t82d = torus82(translate(rotateX(pos, PIBYTWO), torusPos), 1.0f, 0.5f);
 
-      float d = opSubtract(cd, sd);
-      d = opUnion(td, d);
-      //d = opIntersect(td, d);
+      static const Vector t88Pos(1.6f, 1.0f, -1.3f);
+      float t88d = torus88(rotateX(translate(pos, t88Pos), PIBYTWO), 0.6f, 0.3f);
+
+      float d = opSubtract(bd, sd);
       d = opUnion(fd, d);
+      d = opUnion(t82d, d);
+      d = opUnion(t88d, d);
+
 
       return d;
    }
@@ -233,10 +240,10 @@ void setupScene()
 	raytracer->SetScene(scene);
 
 	//unthinkable without multithreading
-	raytracer->SetShadowQuality(1);
-	raytracer->SetMultisampling(1);
+	raytracer->SetShadowQuality(512);
+	raytracer->SetMultisampling(64);
 	raytracer->SetReflectionBlur(1);
-   raytracer->SetOcclusion(0);
+   raytracer->SetOcclusion(10);
 }
 
 void cleanupScene()

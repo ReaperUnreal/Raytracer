@@ -322,12 +322,12 @@ float Vector::MaxComp(const Vector &v)
 
 Vector Vector::Mod(const Vector &v, const Vector &c)
 {
+   static const __m128i SIGNMASK = _mm_set1_epi32(0x80000000);
+
    __m128 div = v.v / c.v;
 #ifdef __SSE4_1__
    div = _mm_round_ps(div, _MM_FROUND_TO_ZERO);
 #else
-   static const __m128i SIGNMASK = _mm_set1_epi32(0x80000000);
-
    __m128i ints = _mm_cvttps_epi32(div);
    __m128 truncs = _mm_cvtepi32_ps(ints);
 
@@ -338,5 +338,15 @@ Vector Vector::Mod(const Vector &v, const Vector &c)
 #endif
    __m128 mul = _mm_mul_ps(c.v, div);
    __m128 mod = _mm_sub_ps(v.v, mul);
-   return Vector(mod);
+
+   //clear the bottom value, since it's going to be a nan probably
+   mod = _mm_move_ss(mod, _mm_setzero_ps());
+
+   //fixup the signs
+   //__m128 signmod = _mm_castsi128_ps(_mm_sign_epi32(_mm_castps_si128(mod), _mm_castps_si128(v.v)));
+   __m128 origsigns = _mm_and_ps(_mm_castsi128_ps(SIGNMASK), v.v);
+   __m128 absmod = _mm_andnot_ps(_mm_castsi128_ps(SIGNMASK), mod);
+   __m128 signmod = _mm_or_ps(absmod, origsigns);
+
+   return Vector(signmod);
 }

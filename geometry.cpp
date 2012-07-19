@@ -944,7 +944,7 @@ float SDF::opIntersect(float d1, float d2) const
 
 Vector SDF::repeat(const Vector &p, const Vector &c) const
 {
-   Vector q = Vector::Mod(p, c) - (c * 0.5f);
+   Vector q = Vector::Mod(p, c);
    return q;
 }
 
