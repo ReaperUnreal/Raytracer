@@ -57,6 +57,12 @@ Quaternion Quaternion::operator-(const Quaternion &iq) const
 
 Quaternion Quaternion::operator*(const Quaternion &iq) const
 {
+   float na = a * iq.a - x * iq.x - y * iq.y - z * iq.z;
+   float nx = a * iq.x + x * iq.a + y * iq.z - z * iq.y;
+   float ny = a * iq.y - x * iq.z + y * iq.a + z * iq.x;
+   float nz = a * iq.z + x * iq.y - y * iq.x + z * iq.a;
+
+   return Quaternion(na, nx, ny, nz);
 }
 
 Quaternion Quaternion::operator/(const Quaternion &iq) const
@@ -71,10 +77,13 @@ Quaternion Quaternion::operator=(const Quaternion &iq)
 
 Quaternion Quaternion::operator*(float f) const
 {
+   return Quaternion(a * f, x * f, y * f, z * f);
 }
 
 Quaternion Quaternion::operator/(float f) const
 {
+   float invf = 1.0f / f;
+   return Quaternion(a * invf, x * invf, y * invf, z * invf);
 }
 
 void Quaternion::operator+=(const Quaternion &iq)
@@ -95,6 +104,15 @@ void Quaternion::operator-=(const Quaternion &iq)
 
 void Quaternion::operator*=(const Quaternion &iq)
 {
+   float na = a * iq.a - x * iq.x - y * iq.y - z * iq.z;
+   float nx = a * iq.x + x * iq.a + y * iq.z - z * iq.y;
+   float ny = a * iq.y - x * iq.z + y * iq.a + z * iq.x;
+   float nz = a * iq.z + x * iq.y - y * iq.x + z * iq.a;
+
+   a = na;
+   x = nx;
+   y = ny;
+   z = nz;
 }
 
 void Quaternion::operator/=(const Quaternion &iq)
@@ -103,9 +121,18 @@ void Quaternion::operator/=(const Quaternion &iq)
 
 void Quaternion::operator*=(float f)
 {
+   a *= f;
+   x *= f;
+   y *= f;
+   z *= f;
 }
 
 void Quaternion::operator/=(float f)
 {
+   float invf = 1.0f / f;
+   a *= invf;
+   x *= invf;
+   y *= invf;
+   z *= invf;
 }
 
