@@ -40,6 +40,7 @@ public:
 
    //various functions
    Quaterion Conjugate() const;
+   Quaternion Reciprocal() const;
    float Magnitude() const;
    float MagnitudeSquare() const;
 

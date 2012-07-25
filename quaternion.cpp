@@ -141,6 +141,21 @@ Quaternion Quaternion::Conjugate() const
    return Quaternion(a, -x, -y, -z);
 }
 
+Quaternion Quaternion::Reciprocal() const
+{
+   //defined as q^-1 = q* / ||q||^2
+   // or the conjugate divided by the magnitude squared
+   float mag2 = (a * a) + (x * x) + (y * y) + (z * z);
+   float invmag2 = 1.0f / mag2;
+
+   float na = a * invmag2;
+   float nx = x * (-invmag2);
+   float ny = y * (-invmag2);
+   float nz = z * (-invmag2);
+
+   return Quaternion(na, nx, ny, nz);
+}
+
 float Quaternion::Magnitude() const
 {
    return sqrtf((a * a) + (x * x) + (y * y) + (z * z));
