@@ -40,6 +40,8 @@ public:
 
    //various functions
    Quaterion Conjugate() const;
+   float Magnitude() const;
+   float MagnitudeSquare() const;
 
 	//memory
 #ifdef SSE2_ENABLE

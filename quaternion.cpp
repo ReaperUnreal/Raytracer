@@ -141,3 +141,13 @@ Quaternion Quaternion::Conjugate() const
    return Quaternion(a, -x, -y, -z);
 }
 
+float Quaternion::Magnitude() const
+{
+   return sqrtf((a * a) + (x * x) + (y * y) + (z * z));
+}
+
+float Quaternion::MagnitudeSquare() const
+{
+   return (a * a) + (x * x) + (y * y) + (z * z);
+}
+
