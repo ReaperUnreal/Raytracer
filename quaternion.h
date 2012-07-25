@@ -38,6 +38,9 @@ public:
 	void operator*=(float f);
 	void operator/=(float f);
 
+   //various functions
+   Quaterion Conjugate() const;
+
 	//memory
 #ifdef SSE2_ENABLE
    union

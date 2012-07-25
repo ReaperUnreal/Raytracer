@@ -136,3 +136,8 @@ void Quaternion::operator/=(float f)
    z *= invf;
 }
 
+Quaternion Quaternion::Conjugate() const
+{
+   return Quaternion(a, -x, -y, -z);
+}
+
