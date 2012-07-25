@@ -9,7 +9,7 @@ public:
 	//constructor and destructor
 	Quaternion(float _a = 0.0f, float _x = 0.0f, float _y = 0.0f, float _z = 0.0f);
 	Quaternion(float *arr);
-#ifdef SSE2_ENABLE
+#ifdef SSE2_ENABLE_QUAT
 	Quaternion(__m128 iq);
 #endif
 
@@ -39,14 +39,14 @@ public:
 	void operator/=(float f);
 
    //various functions
-   Quaterion Conjugate() const;
+   Quaternion Conjugate() const;
    Quaternion Reciprocal() const;
    Quaternion Square() const;
    float Magnitude() const;
    float MagnitudeSquare() const;
 
 	//memory
-#ifdef SSE2_ENABLE
+#ifdef SSE2_ENABLE_QUAT
    union
    {
       __m128 v;

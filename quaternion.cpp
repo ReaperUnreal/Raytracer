@@ -1,5 +1,5 @@
 #include "main.h"
-Quaternion::Quaternion(float _a = 0.0f, float _x = 0.0f, float _y = 0.0f, float _z = 0.0f)
+Quaternion::Quaternion(float _a, float _x, float _y, float _z)
 {
    a = _a;
    x = _x;
@@ -13,7 +13,7 @@ Quaternion::Quaternion(float *arr)
    memcpy(array, arr, 4 * sizeof(float));
 }
 
-virtual Quaternion::~Quaternion(void)
+Quaternion::~Quaternion(void)
 {
 }
 
@@ -75,6 +75,8 @@ Quaternion Quaternion::operator=(const Quaternion &iq)
 {
    //same reasoning as array constructor
    memcpy(array, iq.array, 4 * sizeof(float));
+   
+   return *this;
 }
 
 Quaternion Quaternion::operator*(float f) const
