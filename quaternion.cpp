@@ -156,6 +156,16 @@ Quaternion Quaternion::Reciprocal() const
    return Quaternion(na, nx, ny, nz);
 }
 
+Quaternion Quaternion::Square() const
+{
+   float na = a * a - x * x - y * y - z * z;
+   float nx = 2.0f * a * x;
+   float ny = 2.0f * a * y;
+   float nz = 2.0f * a * z;
+
+   return Quaternion(na, nx, ny, nz);
+}
+
 float Quaternion::Magnitude() const
 {
    return sqrtf((a * a) + (x * x) + (y * y) + (z * z));
