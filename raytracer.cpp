@@ -435,7 +435,7 @@ void Raytracer::Render(void)
 	int y, x, s;
 	float u = 0.0f, v = 0.0f;
 #ifdef OMP_ENABLE
-   #pragma omp parallel for default(none) shared(height, width, dy, dx, o, surface, topleft, offset, numSamples, divider) private(x, y, screenpos, pixel, dir, geom, s, accumulator, u, v) firstprivate(r, dist) schedule(static, 2)
+   #pragma omp parallel for default(none) shared(height, width, dy, dx, o, surface, topleft, offset, numSamples, divider) private(x, y, screenpos, pixel, dir, geom, s, accumulator, u, v) firstprivate(r, dist) schedule(dynamic, 2)
 #endif
 	for(y = 0; y < height; y++)
 	{

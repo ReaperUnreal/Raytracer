@@ -76,15 +76,15 @@ public:
    {
       //if r < R
       //2r^3/R^3 - 3r^2/R^2 + 1
-      //R = 2
-      // => 1/4r^3 - 3/4r^2 + 1
+      //R = 1
+      // => 2r^3 - 3r^2 + 1
 
-      if(r2 >= 4.0f)
+      if(r2 >= 1.0f)
          return 0.0f;
 
       float r = sqrtf(r2);
       float r3 = r2 * r;
-      return (0.25f * r3) - (0.75f * r2) + 1;
+      return (2.0f * r3) - (3.0f * r2) + 1;
    }
 
    float f(const Vector &x) const
@@ -101,17 +101,17 @@ public:
 
       float sum = c(r1) + c(r2) + c(r3);
 
-      return 0.005f - sum;
+      return 0.015f - sum;
    }
 
-   virtual float distance(Vector &pos) const
+   virtual float distance2(Vector &pos) const
    {
-      //d(x, B) >= 2/3 * f(x) * sum(Ri)
-      //Ri = 2
-      //d(x, B) >= 2/3 * 6 * f(x)
-      //d(x, B) >= 4 * f(x)
+      //d(x, B) >= (2Ri/3)^n * f(x)
+      //Ri = 1
+      //d(x, B) >= (2/3)^3 * f(x)
+      //d(x, B) >= 8/27 * f(x)
 
-      float bd =  4.0f * f(pos);
+      float bd =  (8.0f * f(pos)) / 27.0f;
       float d = bd;
 
       //cylinder
@@ -119,6 +119,41 @@ public:
       float cd = cp.Length() - 1.0f;
 
       //d = fmax(-cd, bd);
+
+      //the floor plane
+      static const Vector normal(0, 1, 0);
+      float fd = pos.Dot(normal) + 2.0f;
+
+      d = fmin(d, fd);
+
+      return d;
+   }
+
+   virtual float distance(Vector &pos) const
+   {
+      // the 3 points
+      static const Vector v1(-1.0f, 0.0f, 0.0f);
+      static const Vector v2(1.0f, 0.0f, 0.0f);
+      static const Vector v3(0.0f, sqrtf(3.0f), 0.0f);
+
+      //f = magic - sum(||pos - pi||)
+      float r1 = (pos - v1).Length();
+      float r2 = (pos - v2).Length();
+      float r3 = (pos - v3).Length();
+
+      float sum = r1 + r2 + r3;
+
+      float f = 24.0f - sum;
+      //float f = r1 - 1.0f;
+
+      //C = PI(2Ri/3)
+      //C = (2R/3)^n
+      //R = 1
+      //C = (2/3)^n
+      //n = 3
+      //C = 8/27
+
+      float d = (f * 8.0f) / 27.0f;
 
       //the floor plane
       static const Vector normal(0, 1, 0);
@@ -148,6 +183,7 @@ void setupScene()
 
    //SDFScene *sdf = new SDFScene();
    SDFScene2 *sdf = new SDFScene2();
+   //SDFMetaball *sdf = new SDFMetaball();
    sdf->GetMaterial().SetColor(Color::white);
    sdf->GetMaterial().SetDiffuse(1.0f);
 	sdf->GetMaterial().SetSpecular(0.0f);
@@ -160,7 +196,7 @@ void setupScene()
 	sphere->GetMaterial().SetReflectivity(0.0f);
    //scene->AddObject(sphere);
 
-	Sphere *smaller = new Sphere(Vector(2.0f, -1.5f, 1.3f), 0.5f);
+	Sphere *smaller = new Sphere(Vector(1.5f, -1.5f, 0.6f), 0.5f);
 	smaller->GetMaterial().SetColor(Color::white);
 	smaller->GetMaterial().SetDiffuse(0.0f);
 	smaller->GetMaterial().SetSpecular(0.0f);
@@ -170,8 +206,8 @@ void setupScene()
 	Sphere *another = new Sphere(Vector(6.0f, -1.0f, -4.0f), 1.0f);
 	another->GetMaterial().SetColor(Color::red);
 	another->GetMaterial().SetDiffuse(1.0f);
-	another->GetMaterial().SetSpecular(0.0f);
-	//scene->AddObject(another);
+	another->GetMaterial().SetSpecular(1.0f);
+   //scene->AddObject(another);
 
 	Sphere *light = new Sphere(Vector(-4.0f, 4.0f, 3.0f), 1.0f);
 	light->SetLight(true);
@@ -240,10 +276,10 @@ void setupScene()
 	raytracer->SetScene(scene);
 
 	//unthinkable without multithreading
-	raytracer->SetShadowQuality(512);
-	raytracer->SetMultisampling(64);
+	raytracer->SetShadowQuality(1);
+	raytracer->SetMultisampling(1);
 	raytracer->SetReflectionBlur(1);
-   raytracer->SetOcclusion(10);
+   raytracer->SetOcclusion(4);
 }
 
 void cleanupScene()
