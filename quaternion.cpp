@@ -67,6 +67,8 @@ Quaternion Quaternion::operator*(const Quaternion &iq) const
 
 Quaternion Quaternion::operator/(const Quaternion &iq) const
 {
+   //there's way too much math to get wrong here, best not copy and paste
+   return operator*(iq.Reciprocal());
 }
 
 Quaternion Quaternion::operator=(const Quaternion &iq)
@@ -117,6 +119,8 @@ void Quaternion::operator*=(const Quaternion &iq)
 
 void Quaternion::operator/=(const Quaternion &iq)
 {
+   //there's way too much math to get wrong here, best not copy and paste
+   operator*=(iq.Reciprocal());
 }
 
 void Quaternion::operator*=(float f)
