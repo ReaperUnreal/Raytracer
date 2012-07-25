@@ -7,10 +7,10 @@ class Quaternion
 {
 public:
 	//constructor and destructor
-	Quaternion(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f);
-	Quaternion(float *a);
+	Quaternion(float _a = 0.0f, float _x = 0.0f, float _y = 0.0f, float _z = 0.0f);
+	Quaternion(float *arr);
 #ifdef SSE2_ENABLE
-	Quaternion(__m128 iv);
+	Quaternion(__m128 iq);
 #endif
 
 	virtual ~Quaternion(void);
@@ -23,16 +23,18 @@ public:
    Vector v() const;
 
 	//operators
-	Quaternion operator+(const Quaternion &iv) const;
-	Quaternion operator-(const Quaternion &iv) const;
-   Quaternion operator*(const Quaternion &iv) const;
-	Quaternion operator=(const Quaternion &iv);
+	Quaternion operator+(const Quaternion &iq) const;
+	Quaternion operator-(const Quaternion &iq) const;
+   Quaternion operator*(const Quaternion &iq) const;
+   Quaternion operator/(const Quaternion &iq) const;
+	Quaternion operator=(const Quaternion &iq);
 	Quaternion operator*(float f) const;
 	Quaternion operator/(float f) const;
 
-	void operator+=(const Quaternion &iv);
-	void operator-=(const Quaternion &iv);
-   void operator*=(const Quaternion &iv);
+	void operator+=(const Quaternion &iq);
+	void operator-=(const Quaternion &iq);
+   void operator*=(const Quaternion &iq);
+   void operator/=(const Quaternion &iq);
 	void operator*=(float f);
 	void operator/=(float f);
 

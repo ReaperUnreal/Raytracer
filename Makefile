@@ -4,7 +4,7 @@ LFLAGS=-fopenmp
 EXECUTABLE=rt
 EASY_BMP_CFLAGS=-c -fopenmp -O3 -march=core2 -mrecip
 SSE_FLAGS=
-SSE_FILES=color.o vector.o
+SSE_FILES=color.o vector.o quaternion.o
 
 ifdef DISABLE_JITTER
    CFLAGS+=-DDISABLE_JITTER
@@ -12,7 +12,7 @@ endif
 
 ifndef DISABLE_SSE
 	SSE_FLAGS += -msse4 -mfpmath=sse -DSSE2_ENABLE
-	SSE_FILES = color_sse.o vector_sse.o
+	SSE_FILES = color_sse.o vector_sse.o quaternion_sse.o
 endif
 CFLAGS += $(SSE_FLAGS)
 
@@ -45,6 +45,12 @@ main.o: main.cpp
 
 progress.o: progress.cpp
 	$(CC) $(CFLAGS) progress.cpp
+
+quaternion.o: quaternion.cpp
+	$(CC) $(CFLAGS) quaternion.cpp
+
+quaternion_sse.o: quaternion_sse.cpp
+	$(CC) $(CFLAGS) quaternion_sse.cpp
 
 ray.o: ray.cpp
 	$(CC) $(CFLAGS) ray.cpp
