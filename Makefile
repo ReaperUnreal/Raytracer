@@ -12,7 +12,7 @@ endif
 
 ifndef DISABLE_SSE
 	SSE_FLAGS += -msse4 -mfpmath=sse -DSSE2_ENABLE
-	SSE_FILES = color_sse.o vector_sse.o quaternion_sse.o
+	SSE_FILES = color_sse.o vector_sse.o quaternion.o
 endif
 CFLAGS += $(SSE_FLAGS)
 
