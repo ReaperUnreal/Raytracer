@@ -118,6 +118,7 @@ typedef union ivu
 
 #include "color.h"
 #include "vector.h"
+#include "quaternion.h"
 #include "rendersurface.h"
 #include "ray.h"
 #include "camera.h"
