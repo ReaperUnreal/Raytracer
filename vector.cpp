@@ -25,6 +25,11 @@ float Vector::zv() const
    return z;
 }
 
+void Vector::Print() const
+{
+   printf("[%0.3f, %0.3f, %0.3f]\n", x, y, z);
+}
+
 //the operators
 Vector Vector::operator +(const Vector &v) const
 {

@@ -72,61 +72,9 @@ public:
 class SDFMetaball : public SDF
 {
 public:
-   float c(const float r2) const
+   float f(float x) const
    {
-      //if r < R
-      //2r^3/R^3 - 3r^2/R^2 + 1
-      //R = 1
-      // => 2r^3 - 3r^2 + 1
-
-      if(r2 >= 1.0f)
-         return 0.0f;
-
-      float r = sqrtf(r2);
-      float r3 = r2 * r;
-      return (2.0f * r3) - (3.0f * r2) + 1;
-   }
-
-   float f(const Vector &x) const
-   {
-      // the 3 points
-      static const Vector v1(-1.0f, 0.0f, 0.0f);
-      static const Vector v2(1.0f, 0.0f, 0.0f);
-      static const Vector v3(0.0f, sqrtf(3.0f), 0.0f);
-
-      //f = T - sum(c(||x - pi||))
-      float r1 = (x - v1).SqrLength();
-      float r2 = (x - v2).SqrLength();
-      float r3 = (x - v3).SqrLength();
-
-      float sum = c(r1) + c(r2) + c(r3);
-
-      return 0.015f - sum;
-   }
-
-   virtual float distance2(Vector &pos) const
-   {
-      //d(x, B) >= (2Ri/3)^n * f(x)
-      //Ri = 1
-      //d(x, B) >= (2/3)^3 * f(x)
-      //d(x, B) >= 8/27 * f(x)
-
-      float bd =  (8.0f * f(pos)) / 27.0f;
-      float d = bd;
-
-      //cylinder
-      Vector cp(pos.xv(), pos.yv(), 0.0f);
-      float cd = cp.Length() - 1.0f;
-
-      //d = fmax(-cd, bd);
-
-      //the floor plane
-      static const Vector normal(0, 1, 0);
-      float fd = pos.Dot(normal) + 2.0f;
-
-      d = fmin(d, fd);
-
-      return d;
+      return 1.5f / x;
    }
 
    virtual float distance(Vector &pos) const
@@ -136,24 +84,14 @@ public:
       static const Vector v2(1.0f, 0.0f, 0.0f);
       static const Vector v3(0.0f, sqrtf(3.0f), 0.0f);
 
-      //f = magic - sum(||pos - pi||)
+      //g = T - sum(f(||pos - pi||))
       float r1 = (pos - v1).Length();
       float r2 = (pos - v2).Length();
       float r3 = (pos - v3).Length();
 
-      float sum = r1 + r2 + r3;
+      float sum = f(r1) + f(r2) + f(r3);
 
-      float f = 24.0f - sum;
-      //float f = r1 - 1.0f;
-
-      //C = PI(2Ri/3)
-      //C = (2R/3)^n
-      //R = 1
-      //C = (2/3)^n
-      //n = 3
-      //C = 8/27
-
-      float d = (f * 8.0f) / 27.0f;
+      float d = (9.7f / (sum * sum) - 0.7f) * 0.3f;
 
       //the floor plane
       static const Vector normal(0, 1, 0);
@@ -182,8 +120,8 @@ void setupScene()
 	scene = new Scene(8);
 
    //SDFScene *sdf = new SDFScene();
-   SDFScene2 *sdf = new SDFScene2();
-   //SDFMetaball *sdf = new SDFMetaball();
+   //SDFScene2 *sdf = new SDFScene2();
+   SDFMetaball *sdf = new SDFMetaball();
    sdf->GetMaterial().SetColor(Color::white);
    sdf->GetMaterial().SetDiffuse(1.0f);
 	sdf->GetMaterial().SetSpecular(0.0f);
@@ -312,16 +250,22 @@ void outputImage(const char *filename = "out.bmp")
 
 void test()
 {
-   Vector v1(2.5f, 4.5f, -1.5f);
-   //v1.array[0] = 4;
-   Vector v2(2.0f, 2.0f, 2.0f);
+   //Vector v1(2.5f, 4.5f, -1.5f);
+   ////v1.array[0] = 4;
+   //Vector v2(2.0f, 2.0f, 2.0f);
 
-   printf("[%0.1f, %0.1f, %0.1f, %0.1f]\n", v1.array[0], v1.array[1], v1.array[2], v1.array[3]);
-   printf("[%0.1f, %0.1f, %0.1f, %0.1f]\n", v2.array[0], v2.array[1], v2.array[2], v2.array[3]);
+   //printf("[%0.1f, %0.1f, %0.1f, %0.1f]\n", v1.array[0], v1.array[1], v1.array[2], v1.array[3]);
+   //printf("[%0.1f, %0.1f, %0.1f, %0.1f]\n", v2.array[0], v2.array[1], v2.array[2], v2.array[3]);
 
-   Vector v = Vector::Mod(v1, v2);
+   //Vector v = Vector::Mod(v1, v2);
 
-   printf("[%0.1f, %0.1f, %0.1f, %0.1f]\n", v.array[0], v.array[1], v.array[2], v.array[3]);
+   //printf("[%0.1f, %0.1f, %0.1f, %0.1f]\n", v.array[0], v.array[1], v.array[2], v.array[3]);
+   Vector pos(0.0f, 0.0f, 5.0f);
+   Vector p(1.0f, 0.0f, 0.0f);
+
+   SDFMetaball *sdf = new SDFMetaball();
+   float f = sdf->distance(p);
+   printf("%f\n", f);
 }
 
 void test2()

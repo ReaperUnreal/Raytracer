@@ -771,23 +771,19 @@ Vector SDF::GetNormal(Vector &pos) const
 
 int SDF::Intersect(Ray &r, float &mindist) const
 {
+   const float stepf = 0.5f; // step size factor
    int i = 0;
    float t = 0;
-   while((t < mindist) && (i < iterations))
+   while((t < mindist)) // && (i < iterations))
    {
       Vector p = r.origin + (r.direction * t);
       float d = distance(p);
-      if(d < EPSILON)
-      {
-         i++;
-      }
       if(fabsf(d) < threshold)
       {
          mindist = t;
          return HIT;
       }
-      t += d;
-      i++;
+      t += d * stepf;
    }
 
    return MISS;

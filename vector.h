@@ -20,6 +20,8 @@ public:
    float yv() const;
    float zv() const;
 
+   void Print() const;
+
 	//operators
 	Vector operator+(const Vector &iv) const;
 	Vector operator-(const Vector &iv) const;

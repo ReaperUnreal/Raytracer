@@ -36,6 +36,11 @@ float Vector::zv() const
    return array[1];
 }
 
+void Vector::Print() const
+{
+   printf("[%0.3f, %0.3f, %0.3f]\n", array[3], array[2], array[1]);
+}
+
 //the operators
 Vector Vector::operator +(const Vector &iv) const
 {
