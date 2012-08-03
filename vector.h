@@ -46,6 +46,7 @@ public:
    Vector Reciprocal(void) const;
    Vector Abs(void) const;
    float MaxComp(void) const;
+   Vector Floor(void) const;
 
 
 	static float Length(const Vector &iv);
@@ -60,6 +61,7 @@ public:
    static Vector Abs(const Vector &v);
    static float MaxComp(const Vector &v);
    static Vector Mod(const Vector &v, const Vector &c);
+   static Vector Floor(const Vector &v);
 
 	//memory
 #ifdef SSE2_ENABLE
