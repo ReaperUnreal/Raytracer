@@ -32,7 +32,7 @@
 using namespace std;
 
 const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_HEIGHT = 256;
 const float PI = 3.14159265358979323846264338327950288419716939937511f; //lol, 50 digits!
 const float TWOPI = PI * 2.0f;
 const float PIBYTWO = PI * 0.5f;
@@ -118,6 +118,7 @@ typedef union ivu
 
 #include "color.h"
 #include "vector.h"
+#include "noise.h"
 #include "rendersurface.h"
 #include "ray.h"
 #include "camera.h"
