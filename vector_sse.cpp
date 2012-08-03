@@ -327,6 +327,29 @@ float Vector::MaxComp(const Vector &v)
 
 Vector Vector::Mod(const Vector &v, const Vector &c)
 {
+   float x = v.xv();
+   float y = v.yv();
+   float z = v.zv();
+   float cx = c.xv();
+   float cy = c.yv();
+   float cz = c.zv();
+
+   while((x + cx) < cx)
+      x += cx;
+   while((y + cy) < cy)
+      y += cy;
+   while((z + cz) < cz)
+      z += cz;
+
+   while((x - cx) >= cx)
+      x -= cx;
+   while((y - cy) >= cy)
+      y -= cy;
+   while((z - cz) >= cz)
+      z -= cz;
+
+   return Vector(x, y , z);
+#if 0
    static const __m128i SIGNMASK = _mm_set1_epi32(0x80000000);
 
    __m128 div = v.v / c.v;
@@ -354,4 +377,5 @@ Vector Vector::Mod(const Vector &v, const Vector &c)
    __m128 signmod = _mm_or_ps(absmod, origsigns);
 
    return Vector(signmod);
+#endif
 }
