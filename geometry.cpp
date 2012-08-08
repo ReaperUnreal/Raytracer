@@ -772,7 +772,7 @@ Vector SDF::GetNormal(Vector &pos) const
 int SDF::Intersect(Ray &r, float &mindist) const
 {
    const float stepf = 0.5f; // step size factor
-   int i = 0;
+   //int i = 0;
    float t = 0;
    while((t < mindist)) // && (i < iterations))
    {
@@ -942,5 +942,198 @@ Vector SDF::repeat(const Vector &p, const Vector &c) const
 {
    Vector q = Vector::Mod(p, c);
    return q;
+}
+
+//the Bounding Volume Heirarchy class
+BVH::BVH(int childrenPerLevel) : branchiness(childrenPerLevel), numObjects(0), root(NULL)
+{
+}
+
+BVH::~BVH()
+{
+	//tear down tree most likely
+}
+
+int BVH::GetType() const
+{
+	return BVHACCEL;
+}
+
+Vector BVH::GetNormal(Vector &pos) const
+{
+	// should never use this
+	return Vector();
+}
+
+int BVH::Intersect(Ray &r, float &mindist) const
+{
+	// similar to IntersectRecursive but I only care IF we hit, not WHAT we hit
+	Geometry *geom = NULL;
+	return IntersectRecursive(r, mindist, &geom);
+}
+
+Vector BVH::GeneratePoint() const
+{
+	// should never use this
+	return MISS;
+}
+
+int BVH::Recurse(TreeNode *node, Ray &r, float &mindist, Geometry **obj) const
+{
+	//base case
+	int numChildren = node->children.size();
+	if(numChildren == 0)
+	{
+		//check through all the members for an intersection
+		int len = node->members.size();
+		for(int i = 0; i < len; i++)
+		{
+			if(node->members[i]->Intersect(r, mindist) == HIT)
+			{
+				*obj = node->members[i];
+				return HIT;
+			}
+		}
+		return MISS;
+	}
+
+	//recursive case
+	for(int i = 0; i < numChildren; i++)
+	{
+		float newdist = mindist;
+		if(node->children[i]->bounds->Intersect(r, newdist) != MISS) //we could be INPRIM on a bounding sphere but still HIT an object
+		{
+			int res = Recurse(node->children[i], r, mindist, obj);
+			if(res == HIT)
+			{
+				return res;
+			}
+		}
+	}
+
+	//no hits in any of the children
+	return MISS;
+}
+
+int BVH::IntersectRecursive(Ray &r, float &mindist, Geometry **obj) const
+{
+	//the main BVH method
+	//traverse the heirarchy and find the right object
+	
+#if 0 //basic test to make sure root covers all
+	float newdist = mindist;
+	if(root->bounds->Intersect(r, newdist))
+	{
+		int len = root->members.size();
+		for(int i = 0; i < len; i++)
+		{
+			if(root->members[i]->Intersect(r, mindist) == HIT)
+			{
+				*obj = root->members[i];
+				return HIT;
+			}
+		}
+	}
+#else
+	//first check the root
+	float newdist = mindist;
+	if(root->bounds->Intersect(r, newdist) == MISS)
+	{
+		return MISS;
+	}
+
+	//next traverse the heirarchy
+	return Recurse(root, r, mindist, obj);
+	
+#endif
+	return MISS;
+}
+
+void BVH::AddObject(Geometry *obj, Sphere *bounds)
+{
+	//just add the objects for now, we'll build the tree later
+	objects.push_back(obj);
+	objectBounds.push_back(bounds);
+	++numObjects;
+}
+
+void BVH::TreeNode::CalcBounds()
+{
+	//probably the worst way to get a bounding ball
+	int numObjects = members.size();
+	Vector position;
+	float radius = 0.0f;
+
+	//find the centroid
+	Vector sum;
+	for(int i = 0; i < numObjects; ++i)
+	{
+		sum += memberBounds[i]->GetPosition();
+	}
+	position = sum / lrflti(numObjects);
+
+	//find the radius
+	for(int i = 0; i < numObjects; ++i)
+	{
+		float dist = (position - memberBounds[i]->GetPosition()).Length() + memberBounds[i]->GetRadius();
+		if(dist > radius)
+			radius = dist;
+	}
+
+	//new bounds!
+	bounds = new Sphere(position, radius);
+}
+
+bool BVH::TreeNode::HasChildren()
+{
+	return (children.size() > 0);
+}
+
+void BVH::SplitNode(TreeNode *node)
+{
+	//base case, if there's not enough to split, then stop
+	int numMembers = node->members.size();
+	if(numMembers <= branchiness)
+		return;
+
+	//recursive case, split in $branchiness children
+	int numChildMembers = numMembers / branchiness;
+	for(int i = 0; i < (branchiness - 1); i++)
+	{
+		int start = i * numChildMembers;
+		TreeNode *child = new TreeNode();
+		child->members.insert(child->members.begin(), node->members.begin() + start, node->members.begin() + start + numChildMembers);
+		child->memberBounds.insert(child->memberBounds.begin(), node->memberBounds.begin() + start, node->memberBounds.begin() + start + numChildMembers);
+		child->CalcBounds();
+		node->children.push_back(child);
+	}
+
+	//last child might have more children
+	int start = (branchiness - 1) * numChildMembers;
+	TreeNode *child = new TreeNode();
+	child->members.insert(child->members.begin(), node->members.begin() + start, node->members.end());
+	child->memberBounds.insert(child->memberBounds.begin(), node->memberBounds.begin() + start, node->memberBounds.end());
+	child->CalcBounds();
+	node->children.push_back(child);
+
+	//recurse
+	for(int i = 0; i < branchiness; i++)
+	{
+		SplitNode(node->children[i]);
+	}
+}
+
+void BVH::CalculateTree()
+{
+	//basic tree build that's really dumb
+	//sequentially add objects
+	root = new TreeNode();
+
+	root->members.insert(root->members.begin(), objects.begin(), objects.end());
+	root->memberBounds.insert(root->memberBounds.begin(), objectBounds.begin(), objectBounds.end());
+	root->CalcBounds();
+
+	//now recursively subdivide
+	SplitNode(root);
 }
 

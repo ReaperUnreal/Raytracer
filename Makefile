@@ -19,7 +19,7 @@ CFLAGS += $(SSE_FLAGS)
 all: CFLAGS+=-O3 -DOMP_ENABLE -ffast-math -fprefetch-loop-arrays -funsafe-loop-optimizations -fno-signed-zeros -fno-trapping-math -fassociative-math -freciprocal-math -mrecip
 all: $(EXECUTABLE)
 
-debug: CFLAGS+=-g
+debug: CFLAGS+=-g -DDEBUG
 debug: $(EXECUTABLE)
 
 $(EXECUTABLE): camera.o EasyBMP.o geometry.o main.o progress.o ray.o raytracer.o rendersurface.o scene.o $(SSE_FILES)

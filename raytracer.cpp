@@ -5,7 +5,7 @@ Raytracer::Raytracer(void)
 	rs = NULL;
 	cam = NULL;
 	sc = NULL;
-   pu = NULL;
+	pu = NULL;
 	shadowQuality = 1;
 	reflectionBlur = 1;
 	multisampling = 1;
@@ -14,11 +14,11 @@ Raytracer::Raytracer(void)
 
 Raytracer::~Raytracer(void)
 {
-   if(pu)
-   {
-      delete pu;
-      pu = NULL;
-   }
+	if(pu)
+	{
+		delete pu;
+		pu = NULL;
+	}
 }
 
 
@@ -54,31 +54,31 @@ Scene* Raytracer::GetScene(void)
 
 void Raytracer::SetProgressUpdater(ProgressUpdater *progress)
 {
-   pu = progress;
+	pu = progress;
 }
 
 void Raytracer::SetProgress(float p)
 {
-   if(pu)
-   {
-      pu->Update(p);
-   }
+	if(pu)
+	{
+		pu->Update(p);
+	}
 }
 
 void Raytracer::InitProgress()
 {
-   if(pu)
-   {
-      pu->Init();
-   }
+	if(pu)
+	{
+		pu->Init();
+	}
 }
 
 void Raytracer::FinishProgress()
 {
-   if(pu)
-   {
-      pu->Finish();
-   }
+	if(pu)
+	{
+		pu->Finish();
+	}
 }
 
 void Raytracer::SetShadowQuality(int quality)
@@ -132,7 +132,7 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 	dist = MAX_DIST;
 	Vector intersection, L, N, V, R, sampleDir, samplePos;
 	Geometry *geom = NULL;
-	int result = 0;
+	//int result = 0;
 	int res;
 	float dot, diff, spec, shade = 0.0f, ldist, rdist, tempdist, ambient;
 	float step = 1.0f / lrflti(shadowQuality);
@@ -141,14 +141,27 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 	bool inShade;
 
 	//find the nearest intersection
-   vector<Geometry *> &gv = sc->GetObjects();
-   for(vector<Geometry *>::iterator git = gv.begin(); git != gv.end(); git++)
+	vector<Geometry *> &gv = sc->GetObjects();
+	for(vector<Geometry *>::iterator git = gv.begin(); git != gv.end(); git++)
 	{
-      res = (*git)->Intersect(r, dist);
-		if(res)
+		if((*git)->GetType() == Geometry::BVHACCEL)
 		{
-			geom = *git;
-			result = res;
+			BVH *bvh = static_cast<BVH *>(*git);
+			Geometry *ng = NULL;
+			res = bvh->IntersectRecursive(r, dist, &ng);
+			if(res)
+			{
+				geom = ng;
+			}
+		}
+		else
+		{
+			res = (*git)->Intersect(r, dist);
+			if(res)
+			{
+				geom = *git;
+				//result = res;
+			}
 		}
 	}
 
@@ -166,8 +179,8 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 		intersection = r.origin + (r.direction * dist);
 
 		//accumulate the lighting
-      vector<Geometry *> &lov = sc->GetObjects();
-      for(vector<Geometry *>::iterator lit = lov.begin(); lit != lov.end(); lit++)
+		vector<Geometry *> &lov = sc->GetObjects();
+		for(vector<Geometry *>::iterator lit = lov.begin(); lit != lov.end(); lit++)
 		{
 			if(((*lit)->IsLight()) && ((*lit)->GetType() == Geometry::SPHERE))
 			{
@@ -175,24 +188,24 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 				ldist = L.Length();
 				L /= ldist;
 
-            if(geom->GetType() == Geometry::SDFUNC)
-            {
-               N = geom->GetNormal(intersection);
-               shadow.origin = intersection + N * (10.0f * EPSILON);
-            }
-            else
-            {
-               shadow.origin = intersection + L * EPSILON;
-            }
+				if(geom->GetType() == Geometry::SDFUNC)
+				{
+					N = geom->GetNormal(intersection);
+					shadow.origin = intersection + N * (10.0f * EPSILON);
+				}
+				else
+				{
+					shadow.origin = intersection + L * EPSILON;
+				}
 
 				//shadow
 				if(shadowQuality == 1)
 				{
 					shade = 1.0f;
-               
+
 					shadow.direction = L;
-               vector<Geometry *> &sov = sc->GetObjects();
-               for(vector<Geometry *>::iterator sit = sov.begin(); sit != sov.end(); sit++)
+					vector<Geometry *> &sov = sc->GetObjects();
+					for(vector<Geometry *>::iterator sit = sov.begin(); sit != sov.end(); sit++)
 					{
 						if((*sit != *lit) && ((*sit)->Intersect(shadow, ldist)))
 						{
@@ -213,8 +226,8 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 						shadow.direction.Normalize();
 						inShade = false;
 						tempdist = ldist;
-                  vector<Geometry *> &sov = sc->GetObjects();
-                  for(vector<Geometry *>::iterator sit = sov.begin(); sit != sov.end(); sit++)
+						vector<Geometry *> &sov = sc->GetObjects();
+						for(vector<Geometry *>::iterator sit = sov.begin(); sit != sov.end(); sit++)
 						{
 							if((*sit != *lit) && ((*sit)->Intersect(shadow, tempdist)))
 							{
@@ -258,8 +271,8 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 						}
 					}
 
-               col += (diffuse + specular) * shade;
-               //col += geom->GetMaterial().GetColor();
+					col += (diffuse + specular) * shade;
+					//col += geom->GetMaterial().GetColor();
 				}
 			}
 		} //end light loop
@@ -267,105 +280,105 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 		//calculate ambient lighting
 		if(occlusion > 0)
 		{
-         //setup needed for both types of AO
-         ambient = 0.0f;
-         float invsamples = 1.0f / lrflti(occlusion);
+			//setup needed for both types of AO
+			ambient = 0.0f;
+			float invsamples = 1.0f / lrflti(occlusion);
 
-         //we can use really fake and fast AO for SDFs
-         if(geom->GetType() == Geometry::SDFUNC)
-         {
-            //from Rendering Worlds With Two Triangles paper
-            //ao = 1 - k * sum(1, 5, 1/(2^i) * (pink(i) - yellow(i)));
-            // pink(i) = distance from intersection point to sample point along the normal
-            //         = delta * i
-            // yellow(i) = distance from sample point to surface
-            //           = distfield(intersection + delta * i * n)
-            N = geom->GetNormal(intersection);
-            SDF *sdf = reinterpret_cast<SDF *>(geom);
-            float sum = 0.0f;
-            float k = 0.3f; // magic number for choosing overall strength of AO
-            float scale = 1.0f;
-            float delta = 0.1f; // magic number for sample distances
-            for(int i = 1; i <= occlusion; i++)
-            {
-               scale *= 0.5f;
-               float pink = delta * static_cast<float>(i);
-               
-               Vector sample = intersection + (N * pink);
-               float yellow = sdf->distance(sample);
+			//we can use really fake and fast AO for SDFs
+			if(geom->GetType() == Geometry::SDFUNC)
+			{
+				//from Rendering Worlds With Two Triangles paper
+				//ao = 1 - k * sum(1, 5, 1/(2^i) * (pink(i) - yellow(i)));
+				// pink(i) = distance from intersection point to sample point along the normal
+				//         = delta * i
+				// yellow(i) = distance from sample point to surface
+				//           = distfield(intersection + delta * i * n)
+				N = geom->GetNormal(intersection);
+				SDF *sdf = reinterpret_cast<SDF *>(geom);
+				float sum = 0.0f;
+				float k = 0.3f; // magic number for choosing overall strength of AO
+				float scale = 1.0f;
+				float delta = 0.1f; // magic number for sample distances
+				for(int i = 1; i <= occlusion; i++)
+				{
+					scale *= 0.5f;
+					float pink = delta * static_cast<float>(i);
 
-               sum += scale * fmax(pink - yellow, 0.0f); //note that pink >= yellow since the intersection point is the furthest possible you could go
-            }
-            ambient = k * (1.0f - sum);
-         }
-         else
-         {
-            //initialize the ambient light
-            float u, v, sqrtv, angle, ambdist;
-            bool intersected;
-            Vector sampleDir;
+					Vector sample = intersection + (N * pink);
+					float yellow = sdf->distance(sample);
 
-            //shoot out cosine weighted rays
-            for(int i = 0; i < occlusion; i++)
-            {
-               u = lrflti(rand()) * MAX_RAND_DIVIDER * TWOPI;
-               v = lrflti(rand()) * MAX_RAND_DIVIDER;
-               sqrtv = sqrtf(v);
-               sampleDir =  Vector(cosf(u) * sqrtv, sinf(u) * sqrtv, sqrtf(1.0f - v));
+					sum += scale * fmax(pink - yellow, 0.0f); //note that pink >= yellow since the intersection point is the furthest possible you could go
+				}
+				ambient = k * (1.0f - sum);
+			}
+			else
+			{
+				//initialize the ambient light
+				float u, v, sqrtv, angle, ambdist;
+				bool intersected;
+				Vector sampleDir;
 
-               N = geom->GetNormal(intersection);
-               angle = N.Dot(sampleDir);
-               if(angle < 0)
-               {
-                  sampleDir *= -1.0f;
-                  angle = -angle;
-               }
+				//shoot out cosine weighted rays
+				for(int i = 0; i < occlusion; i++)
+				{
+					u = lrflti(rand()) * MAX_RAND_DIVIDER * TWOPI;
+					v = lrflti(rand()) * MAX_RAND_DIVIDER;
+					sqrtv = sqrtf(v);
+					sampleDir =  Vector(cosf(u) * sqrtv, sinf(u) * sqrtv, sqrtf(1.0f - v));
 
-               intersected = false;
-               if(geom->GetType() == Geometry::SDFUNC)
-               {
-                  ambientRay.origin = intersection + N * (10.0f * EPSILON);
-               }
-               else
-               {
-                  ambientRay.origin = intersection + sampleDir * EPSILON;
-               }
-               ambientRay.direction = sampleDir;
-               ambdist = MAXDEPTH;
-               vector<Geometry *> &aov = sc->GetObjects();
-               for(vector<Geometry *>::iterator aoit = aov.begin(); aoit != aov.end(); aoit++)
-               {
-                  if((!(*aoit)->IsLight()) && ((*aoit)->Intersect(ambientRay, ambdist)))
-                  {
-                     intersected = true;
-                     break;
-                  }
-               }
+					N = geom->GetNormal(intersection);
+					angle = N.Dot(sampleDir);
+					if(angle < 0)
+					{
+						sampleDir *= -1.0f;
+						angle = -angle;
+					}
 
-               if(!intersected)
-               {
-                  ambient += invsamples * angle;
-               }
-            }
-         }
+					intersected = false;
+					if(geom->GetType() == Geometry::SDFUNC)
+					{
+						ambientRay.origin = intersection + N * (10.0f * EPSILON);
+					}
+					else
+					{
+						ambientRay.origin = intersection + sampleDir * EPSILON;
+					}
+					ambientRay.direction = sampleDir;
+					ambdist = MAXDEPTH;
+					vector<Geometry *> &aov = sc->GetObjects();
+					for(vector<Geometry *>::iterator aoit = aov.begin(); aoit != aov.end(); aoit++)
+					{
+						if((!(*aoit)->IsLight()) && ((*aoit)->Intersect(ambientRay, ambdist)))
+						{
+							intersected = true;
+							break;
+						}
+					}
 
-         col += geom->GetMaterial().GetColor() * geom->GetMaterial().GetDiffuse() * ambient;
+					if(!intersected)
+					{
+						ambient += invsamples * angle;
+					}
+				}
+			}
+
+			col += geom->GetMaterial().GetColor() * geom->GetMaterial().GetDiffuse() * ambient;
 		}
-		
+
 		//get reflection
 		if(geom->GetMaterial().GetReflectivity() > 0)
 		{	
 			if(depth < TRACEDEPTH)
 			{
 				/*N = geom->GetNormal(intersection);
-				R = r.direction - N * (2.0f * N.Dot(r.direction));
-				Raytrace(Ray(intersection + R * EPSILON, R), reflection, depth + 1, rdist);
-				col += reflection * geom->GetMaterial().GetColor() * geom->GetMaterial().GetReflectivity();*/
+				  R = r.direction - N * (2.0f * N.Dot(r.direction));
+				  Raytrace(Ray(intersection + R * EPSILON, R), reflection, depth + 1, rdist);
+				  col += reflection * geom->GetMaterial().GetColor() * geom->GetMaterial().GetReflectivity();*/
 
 				N = geom->GetNormal(intersection);
 				R = r.direction - N * (2.0f * N.Dot(r.direction));
 				samplePos = intersection + R * EPSILON;
-            Ray reflectedRay(samplePos, R);
+				Ray reflectedRay(samplePos, R);
 				Raytrace(reflectedRay, accumulator, depth + 1, rdist);
 				for(int i = 1; i < reflectionBlur; i++)
 				{
@@ -374,7 +387,7 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 					float z = ((0.2f * lrflti(rand())) / RAND_MAX) - 0.1f;
 					sampleDir = R + Vector(x, y, z);
 					sampleDir.Normalize();
-               Ray sampleRay(samplePos, sampleDir);
+					Ray sampleRay(samplePos, sampleDir);
 					Raytrace(sampleRay, reflection, depth + 1, rdist);
 					accumulator += reflection;
 				}
@@ -422,20 +435,19 @@ void Raytracer::Render(void)
 	Vector offset = o + d * 0.5;
 	Color accumulator;
 	float divider = 1.0f / lrflti(numSamples);
-	
+
 	Ray r;
 	r.origin = o;
 
 	Color pixel;
-	Geometry *geom = NULL;
 	float dist = 0.0f;
-   InitProgress();
+	InitProgress();
 
 	//render each line in parallel
 	int y, x, s;
 	float u = 0.0f, v = 0.0f;
 #ifdef OMP_ENABLE
-   #pragma omp parallel for default(none) shared(height, width, dy, dx, o, surface, topleft, offset, numSamples, divider) private(x, y, screenpos, pixel, dir, geom, s, accumulator, u, v) firstprivate(r, dist) schedule(dynamic, 2)
+#pragma omp parallel for default(none) shared(height, width, dy, dx, o, surface, topleft, offset, numSamples, divider) private(x, y, screenpos, pixel, dir, s, accumulator, u, v) firstprivate(r, dist) schedule(dynamic, 2)
 #endif
 	for(y = 0; y < height; y++)
 	{
@@ -451,26 +463,26 @@ void Raytracer::Render(void)
 				pixel = Color::black;
 				//create the ray
 #ifdef DISABLE_JITTER
-            dir = screenpos - offset;
+				dir = screenpos - offset;
 #else
-            u = lrflti(rand()) * MAX_RAND_DIVIDER;
-            v = lrflti(rand()) * MAX_RAND_DIVIDER;
+				u = lrflti(rand()) * MAX_RAND_DIVIDER;
+				v = lrflti(rand()) * MAX_RAND_DIVIDER;
 				dir = screenpos - offset + (dx * u) + (dy * v);
 #endif
 				dir = dir / dir.Length();
 				r.direction = dir;
 				//trace the actual ray
-				geom = Raytrace(r, pixel, 0, dist);
+				Raytrace(r, pixel, 0, dist);
 				accumulator += pixel;
 			}
 
 			//update the pixel color
 			surface[y * width + x] = accumulator * divider;
-         
-         //update the progression
-         SetProgress(static_cast<float>(y * width + x) / static_cast<float>(width * height));
+
+			//update the progression
+			SetProgress(static_cast<float>(y * width + x) / static_cast<float>(width * height));
 		}
 	}
 
-   FinishProgress();
+	FinishProgress();
 }
