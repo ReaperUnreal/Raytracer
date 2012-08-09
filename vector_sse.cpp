@@ -358,10 +358,10 @@ Vector Vector::Mod(const Vector &v, const Vector &c)
 
 Vector Vector::Floor() const
 {
-   static const __m128i SIGNMASK = _mm_set1_epi32(0x80000000);
 #ifdef __SSE4_1__
    __m128 f = _mm_round_ps(v, _MM_FROUND_TO_ZERO);
 #else
+   static const __m128i SIGNMASK = _mm_set1_epi32(0x80000000);
    __m128i ints = _mm_cvttps_epi32(v);
    __m128 truncs = _mm_cvtepi32_ps(ints);
 
@@ -375,10 +375,10 @@ Vector Vector::Floor() const
 
 Vector Vector::Floor(const Vector &v)
 {
-   static const __m128i SIGNMASK = _mm_set1_epi32(0x80000000);
 #ifdef __SSE4_1__
    __m128 f = _mm_round_ps(v.v, _MM_FROUND_TO_ZERO);
 #else
+   static const __m128i SIGNMASK = _mm_set1_epi32(0x80000000);
    __m128i ints = _mm_cvttps_epi32(v.v);
    __m128 truncs = _mm_cvtepi32_ps(ints);
 

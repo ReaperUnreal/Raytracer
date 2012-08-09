@@ -10,8 +10,8 @@ void setupScene()
 	raytracer = new Raytracer();
 
 	cam = new Camera();
-	cam->MoveTo(Vector(0.0f, 0.0f, 5.0f));
-	cam->LookAt(Vector(0.0f, 0.0f, 0.0f));
+	cam->MoveTo(Vector(0.0f, 0.5f, 5.0f));
+	cam->LookAt(Vector(0.0f, -1.0f, 0.5f));
 	raytracer->SetCamera(cam);
 
 	target = new RenderSurface(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -21,30 +21,36 @@ void setupScene()
 
 	scene = new Scene(100);
 
-   for(int y = 0; y < 9; y++)
+   //all the reflective spheres
+   for(int y = 0; y < 11; y++)
    {
       for(int x = 0; x < 15; x++)
       {
-         Sphere *sphere = new Sphere(Vector(lrflti(2 * (x - 7)), -1.5f, lrflti(-2 * y)), 0.5f);
+         Vector pos = Vector(lrflti(2 * (x - 7)), -1.5f, lrflti(2 - (2 * y)));
+         float offset = Perlin(pos);
+         pos += Vector((offset - 0.5f) * 1.0f, (offset - 0.5f) * 0.2f, 0.0f);
+         Sphere *sphere = new Sphere(pos, 0.5f);
          sphere->GetMaterial().SetColor(Color::white);
-         sphere->GetMaterial().SetDiffuse(1.0f);
+         sphere->GetMaterial().SetDiffuse(0.0f);
          sphere->GetMaterial().SetSpecular(0.0f);
-         sphere->GetMaterial().SetReflectivity(0.0f);
+         sphere->GetMaterial().SetReflectivity(1.0f);
          scene->AddObject(sphere);
       }
    }
+
+
+   //the one red sphere
+   Sphere *red = new Sphere(Vector(3.8f, -1.5f, -3.3f), 0.5f);
+   red->GetMaterial().SetColor(Color::red);
+   red->GetMaterial().SetDiffuse(1.0f);
+   red->GetMaterial().SetSpecular(0.0f);
+   scene->AddObject(red);
 
 	Sphere *light = new Sphere(Vector(-4.0f, 4.0f, 3.0f), 1.0f);
 	light->SetLight(true);
 	light->SetLightIntensity(1.0f);
 	light->GetMaterial().SetColor(Color::white);
 	scene->AddObject(light);
-
-	Sphere *light2 = new Sphere(Vector(-2.0f, 3.0f, 4.0f), 1.0f);
-	light2->SetLight(true);
-	light2->SetLightIntensity(1.0f);
-	light2->GetMaterial().SetColor(Color::white);
-	//scene->AddObject(light2);
 
 	Plane *floor = new Plane(Vector(0.0f, 1.0f, 0.0f), 2.0f);
 	floor->GetMaterial().SetColor(Color::white);
@@ -54,10 +60,10 @@ void setupScene()
 	raytracer->SetScene(scene);
 
 	//unthinkable without multithreading
-	raytracer->SetShadowQuality(1);
-	raytracer->SetMultisampling(1);
+	raytracer->SetShadowQuality(128);
+	raytracer->SetMultisampling(32);
 	raytracer->SetReflectionBlur(1);
-   raytracer->SetOcclusion(0);
+   raytracer->SetOcclusion(256);
 }
 
 void cleanupScene()
