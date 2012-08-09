@@ -379,3 +379,37 @@ Vector Vector::Mod(const Vector &v, const Vector &c)
    return Vector(signmod);
 #endif
 }
+
+Vector Vector::Floor() const
+{
+#ifdef __SSE4_1__
+   __m128 f = _mm_round_ps(v, _MM_FROUND_TO_ZERO);
+#else
+   static const __m128i SIGNMASK = _mm_set1_epi32(0x80000000);
+   __m128i ints = _mm_cvttps_epi32(v);
+   __m128 truncs = _mm_cvtepi32_ps(ints);
+
+   __m128 flags = _mm_castsi128_ps(_mm_cmpeq_epi32(ints, SIGNMASK));
+   __m128 res1 = _mm_and_ps(flags, v);
+   __m128 res2 = _mm_andnot_ps(flags, truncs);
+   __m128 f = _mm_or_ps(res1, res2);
+#endif
+   return Vector(f);
+}
+
+Vector Vector::Floor(const Vector &v)
+{
+#ifdef __SSE4_1__
+   __m128 f = _mm_round_ps(v.v, _MM_FROUND_TO_ZERO);
+#else
+   static const __m128i SIGNMASK = _mm_set1_epi32(0x80000000);
+   __m128i ints = _mm_cvttps_epi32(v.v);
+   __m128 truncs = _mm_cvtepi32_ps(ints);
+
+   __m128 flags = _mm_castsi128_ps(_mm_cmpeq_epi32(ints, SIGNMASK));
+   __m128 res1 = _mm_and_ps(flags, v.v);
+   __m128 res2 = _mm_andnot_ps(flags, truncs);
+   __m128 f = _mm_or_ps(res1, res2);
+#endif
+   return Vector(f);
+}

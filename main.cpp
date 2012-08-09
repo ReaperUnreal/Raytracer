@@ -30,8 +30,8 @@ void setupScene()
 	raytracer = new Raytracer();
 
 	cam = new Camera();
-	cam->MoveTo(Vector(0.0f, 0.0f, 5.0f));
-	cam->LookAt(Vector(0.0f, 0.0f, 0.0f));
+	cam->MoveTo(Vector(0.0f, 0.5f, 5.0f));
+	cam->LookAt(Vector(0.0f, -1.0f, 0.5f));
 	raytracer->SetCamera(cam);
 
 	target = new RenderSurface(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -56,18 +56,13 @@ void setupScene()
 	Plane *floor = new Plane(Vector(0.0f, 1.0f, 0.0f), 2.0f);
 	floor->GetMaterial().SetColor(Color::white);
 	floor->GetMaterial().SetDiffuse(1.0f);
-   //scene->AddObject(floor);
-
-   AABox *floorbox = new AABox(Vector(-6.0f, -2.5f, -6.0f), Vector(6.0f, -2.0f, 6.0f));
-   floorbox->GetMaterial().SetColor(Color::white);
-   floorbox->GetMaterial().SetDiffuse(1.0f);
-   //scene->AddObject(floorbox);
+   scene->AddObject(floor);
 
 	raytracer->SetScene(scene);
 
 	//unthinkable without multithreading
-	raytracer->SetShadowQuality(1);
-	raytracer->SetMultisampling(1);
+	raytracer->SetShadowQuality(128);
+	raytracer->SetMultisampling(32);
 	raytracer->SetReflectionBlur(1);
    raytracer->SetOcclusion(0);
 }

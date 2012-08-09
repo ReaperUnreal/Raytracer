@@ -256,3 +256,19 @@ Vector Vector::Mod(const Vector &v, const Vector &c)
    float z = fmod(v.z, c.z);
    return Vector(x, y, z);
 }
+
+Vector Vector::Floor() const
+{
+   float nx = floor(x);
+   float ny = floor(y);
+   float nz = floor(z);
+   return Vector(nx, ny, nz);
+}
+
+Vector Vector::Floor(const Vector &v)
+{
+   float nx = floor(v.x);
+   float ny = floor(v.y);
+   float nz = floor(v.z);
+   return Vector(nx, ny, nz);
+}
