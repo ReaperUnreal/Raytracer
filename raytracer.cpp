@@ -269,11 +269,15 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 		{
          //setup needed for both types of AO
          ambient = 0.0f;
-         float invsamples = 1.0f / lrflti(occlusion);
 
          //we can use really fake and fast AO for SDFs
          if(geom->GetType() == Geometry::SDFUNC)
          {
+            //this type of AO calculation needs far less "rays"
+            occlusion /= 12;
+            if(occlusion == 0)
+               occlusion = 1;
+
             //from Rendering Worlds With Two Triangles paper
             //ao = 1 - k * sum(1, 5, 1/(2^i) * (pink(i) - yellow(i)));
             // pink(i) = distance from intersection point to sample point along the normal
@@ -304,6 +308,7 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
             float u, v, sqrtv, angle, ambdist;
             bool intersected;
             Vector sampleDir;
+            float invsamples = 1.0f / lrflti(occlusion);
 
             //shoot out cosine weighted rays
             for(int i = 0; i < occlusion; i++)
