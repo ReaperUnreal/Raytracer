@@ -5,6 +5,32 @@ Scene *scene;
 Camera *cam;
 RenderSurface *target;
 
+class SDFScene : public SDF
+{
+public:
+   virtual float distance(Vector &pos) const
+   {
+      //just a sphere
+      static const Vector sphereMove(0.0f, 1.5f, 0.0f);
+      Vector spherePos = translate(pos, sphereMove);
+      float sd = sphere(repeatZ(repeatX(spherePos, 2.0f), 2.0f), 0.5f);
+
+      //the floor plane
+      static const Vector normal(0, 1, 0);
+      float fd = pos.Dot(normal) + 2.0f;
+
+      // the hidden squared donut
+      static const Vector donutPos(0.0f, -1.5f, -5.5f);
+      float td88 = torus88(rotateZ(rotateX(translate(pos, donutPos), PIBYTWO), PI * -0.125f), 1.0f, 0.3f);
+
+      //union
+      float d = fmin(fd, sd);
+      d = fmin(d, td88);
+
+      return d;
+   }
+};
+
 void setupScene()
 {
 	raytracer = new Raytracer();
@@ -19,32 +45,13 @@ void setupScene()
 
    raytracer->SetProgressUpdater(new PercentMonitor());
 
-	scene = new Scene(100);
+	scene = new Scene(8);
 
-   //all the reflective spheres
-   for(int y = 0; y < 11; y++)
-   {
-      for(int x = 0; x < 15; x++)
-      {
-         Vector pos = Vector(lrflti(2 * (x - 7)), -1.5f, lrflti(2 - (2 * y)));
-         float offset = Perlin(pos);
-         pos += Vector((offset - 0.5f) * 1.0f, (offset - 0.5f) * 0.2f, 0.0f);
-         Sphere *sphere = new Sphere(pos, 0.5f);
-         sphere->GetMaterial().SetColor(Color::white);
-         sphere->GetMaterial().SetDiffuse(0.0f);
-         sphere->GetMaterial().SetSpecular(0.0f);
-         sphere->GetMaterial().SetReflectivity(1.0f);
-         scene->AddObject(sphere);
-      }
-   }
-
-
-   //the one red sphere
-   Sphere *red = new Sphere(Vector(3.8f, -1.5f, -3.3f), 0.5f);
-   red->GetMaterial().SetColor(Color::red);
-   red->GetMaterial().SetDiffuse(1.0f);
-   red->GetMaterial().SetSpecular(0.0f);
-   scene->AddObject(red);
+   SDFScene *sdf = new SDFScene();
+   sdf->GetMaterial().SetColor(Color::white);
+   sdf->GetMaterial().SetDiffuse(1.0f);
+	sdf->GetMaterial().SetSpecular(0.0f);
+   scene->AddObject(sdf);
 
 	Sphere *light = new Sphere(Vector(-4.0f, 4.0f, 3.0f), 1.0f);
 	light->SetLight(true);
@@ -52,10 +59,16 @@ void setupScene()
 	light->GetMaterial().SetColor(Color::white);
 	scene->AddObject(light);
 
+   Sphere *ball = new Sphere(Vector(0.0f, 0.5f, 0.0f), 1.5f);
+   ball->GetMaterial().SetColor(Color::white);
+   ball->GetMaterial().SetDiffuse(0.0f);
+   ball->GetMaterial().SetReflectivity(1.0f);
+   scene->AddObject(ball);
+
 	Plane *floor = new Plane(Vector(0.0f, 1.0f, 0.0f), 2.0f);
 	floor->GetMaterial().SetColor(Color::white);
 	floor->GetMaterial().SetDiffuse(1.0f);
-   scene->AddObject(floor);
+   //scene->AddObject(floor);
 
 	raytracer->SetScene(scene);
 
@@ -63,7 +76,7 @@ void setupScene()
 	raytracer->SetShadowQuality(128);
 	raytracer->SetMultisampling(32);
 	raytracer->SetReflectionBlur(1);
-   raytracer->SetOcclusion(256);
+   raytracer->SetOcclusion(0);
 }
 
 void cleanupScene()
@@ -112,6 +125,70 @@ void test()
    //SDFMetaball *sdf = new SDFMetaball();
    //float f = sdf->distance(p);
    //printf("%f\n", f);
+}
+
+void test2()
+{
+   Vector o(0, 0, 5);
+   Vector d(0, 0, -1);
+   Ray r(o, d);
+   Vector dx(1.0f / 6.0f, 0, 0);
+   Vector dy(1.0f / 6.0f, 0, 0);
+
+	raytracer = new Raytracer();
+
+	cam = new Camera();
+	cam->MoveTo(Vector(0.0f, 0.0f, 5.0f));
+	cam->LookAt(Vector(0.0f, 0.0f, 0.0f));
+	raytracer->SetCamera(cam);
+
+	target = new RenderSurface(SCREEN_WIDTH, SCREEN_HEIGHT);
+	raytracer->SetTarget(target);
+
+	scene = new Scene(8);
+
+	//Sphere *sphere = new Sphere(Vector(0, 0, 0), 2.0f);
+   SDFScene *sdf = new SDFScene();
+   sdf->GetMaterial().SetColor(Color::white);
+   sdf->GetMaterial().SetDiffuse(1.0f);
+	sdf->GetMaterial().SetSpecular(0.0f);
+   scene->AddObject(sdf);
+
+	Sphere *light = new Sphere(Vector(0.0f, 0.0f, 7.0f), 1.0f);
+	light->SetLight(true);
+	light->SetLightIntensity(1.0f);
+	light->GetMaterial().SetColor(Color::white);
+	scene->AddObject(light);
+
+	raytracer->SetScene(scene);
+
+	//unthinkable without multithreading
+	raytracer->SetShadowQuality(1);
+	raytracer->SetMultisampling(1);
+	raytracer->SetReflectionBlur(1);
+   raytracer->SetOcclusion(0);
+
+   for(int i = 0; i < 10000000; ++i)
+   {
+      Color pixel = Color::black;
+      float mindist = MAX_DIST;
+      float u = (lrflti(rand()) * MAX_RAND_DIVIDER) - 0.5f;
+      float v = (lrflti(rand()) * MAX_RAND_DIVIDER) - 0.5f;
+      Vector dir = d + (dx * u) + (dy * v);
+      dir.Normalize();
+      r.direction = dir;
+      Geometry *geom = raytracer->Raytrace(r, pixel, 0, mindist);
+      if(geom != sdf)
+      {
+         printf("No hit! d = <%0.1f, %0.1f, %0.1f> mindist = %0.1f\n", r.direction.xv(), r.direction.yv(), r.direction.zv(), mindist);
+         break;
+      }
+      if((pixel.rv() < 0.05f) && (pixel.gv() < 0.05f) && (pixel.bv() < 0.05f))
+      {
+         printf("Black! c = <%0.1f, %0.1f, %0.1f> d = <%0.1f, %0.1f, %0.1f> mindist = %0.1f\n", pixel.rv(), pixel.gv(), pixel.bv(), r.direction.xv(), r.direction.yv(), r.direction.zv(), mindist);
+         break;
+      }
+   }
 }
 
 int main(int argc, char* argv[])

@@ -938,9 +938,36 @@ float SDF::opIntersect(float d1, float d2) const
    return fmax(d1, d2);
 }
 
-Vector SDF::repeat(const Vector &p, const Vector &c) const
+Vector SDF::repeatX(const Vector &p, float space) const
 {
-   Vector q = Vector::Mod(p, c);
+   float x = p.xv();
+   float y = p.yv();
+   float z = p.zv();
+   while(x < 0.0f) x += space; // fix up the negative
+   x = fmod(x, space) - (0.5f * space);
+   Vector q(x, y, z);
+   return q;
+}
+
+Vector SDF::repeatY(const Vector &p, float space) const
+{
+   float x = p.xv();
+   float y = p.yv();
+   float z = p.zv();
+   while(y < 0.0f) y += space; // fix up the negative
+   y = fmod(y, space) - (0.5f * space);
+   Vector q(x, y, z);
+   return q;
+}
+
+Vector SDF::repeatZ(const Vector &p, float space) const
+{
+   float x = p.xv();
+   float y = p.yv();
+   float z = p.zv();
+   while(z < 0.0f) z += space; // fix up the negative
+   z = fmod(z, space) - (0.5f * space);
+   Vector q(x, y, z);
    return q;
 }
 
