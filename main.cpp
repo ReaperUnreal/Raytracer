@@ -11,15 +11,21 @@ public:
    virtual float distance(Vector &pos) const
    {
       //just a sphere
-      static const Vector c(2.0f, 100000.0f, 100000.0f);
-      float sd = sphere(repeat(pos, c), 0.5f);
+      static const Vector sphereMove(0.0f, 1.5f, 0.0f);
+      Vector spherePos = translate(pos, sphereMove);
+      float sd = sphere(repeatZ(repeatX(spherePos, 2.0f), 2.0f), 0.5f);
 
       //the floor plane
       static const Vector normal(0, 1, 0);
       float fd = pos.Dot(normal) + 2.0f;
 
+      // the hidden squared donut
+      static const Vector donutPos(0.0f, -1.5f, -5.5f);
+      float td88 = torus88(rotateZ(rotateX(translate(pos, donutPos), PIBYTWO), PI * -0.125f), 1.0f, 0.3f);
+
       //union
       float d = fmin(fd, sd);
+      d = fmin(d, td88);
 
       return d;
    }
@@ -29,9 +35,9 @@ void setupScene()
 {
 	raytracer = new Raytracer();
 
-	cam = new Camera();
-	cam->MoveTo(Vector(0.0f, 0.5f, 5.0f));
-	cam->LookAt(Vector(0.0f, -1.0f, 0.5f));
+	cam = new Camera(PI * 0.33f);
+	cam->MoveTo(Vector(0.0f, 0.0f, 5.0f));
+	cam->LookAt(Vector(0.0f, -1.5f, 0.0f));
 	raytracer->SetCamera(cam);
 
 	target = new RenderSurface(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -53,15 +59,16 @@ void setupScene()
 	light->GetMaterial().SetColor(Color::white);
 	scene->AddObject(light);
 
-	Plane *floor = new Plane(Vector(0.0f, 1.0f, 0.0f), 2.0f);
-	floor->GetMaterial().SetColor(Color::white);
-	floor->GetMaterial().SetDiffuse(1.0f);
-   scene->AddObject(floor);
+   Sphere *ball = new Sphere(Vector(0.0f, 0.5f, 0.0f), 1.5f);
+   ball->GetMaterial().SetColor(Color::white);
+   ball->GetMaterial().SetDiffuse(0.0f);
+   ball->GetMaterial().SetReflectivity(1.0f);
+   scene->AddObject(ball);
 
 	raytracer->SetScene(scene);
 
 	//unthinkable without multithreading
-	raytracer->SetShadowQuality(128);
+	raytracer->SetShadowQuality(256);
 	raytracer->SetMultisampling(32);
 	raytracer->SetReflectionBlur(1);
    raytracer->SetOcclusion(0);
