@@ -58,3 +58,34 @@ void RenderSurface::ToBMP(BMP &out) const
       }
    }
 }
+
+void RenderSurface::ToRawFile(const char *filename) const
+{
+   //open the file
+   std::ofstream file(filename, ofstream::binary);
+
+   //check for failure
+   if(file.fail())
+   {
+      fprintf(stderr, "Could not open file %s\n", filename);
+      return;
+   }
+
+   //write the size
+   file << width;
+   file << height;
+
+   //write the pixels
+   int num = width * height;
+   Color *iter = surface;
+   for(int i = 0; i < num; i++, iter++)
+   {
+      //r, g, b, in that order
+      file << iter->rv();
+      file << iter->gv();
+      file << iter->bv();
+   }
+
+   //done writing
+   file.close();
+}

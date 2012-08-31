@@ -73,8 +73,8 @@ void setupScene()
 	raytracer->SetScene(scene);
 
 	//unthinkable without multithreading
-	raytracer->SetShadowQuality(128);
-	raytracer->SetMultisampling(32);
+	raytracer->SetShadowQuality(1);
+	raytracer->SetMultisampling(1);
 	raytracer->SetReflectionBlur(1);
    raytracer->SetOcclusion(0);
 }
@@ -100,8 +100,12 @@ void render()
 	raytracer->Render();
 }
 
-void outputImage(const char *filename = "out.bmp")
+void outputImage(const char *filename = "out.bmp", const char *rawfilename = "out.raw")
 {
+   //raw output
+   target->ToRawFile(rawfilename);
+
+   //bmp output
    BMP out;
    target->ToBMP(out);
    out.WriteToFile(filename);
