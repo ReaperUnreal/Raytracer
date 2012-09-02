@@ -327,6 +327,29 @@ float Vector::MaxComp(const Vector &v)
 
 Vector Vector::Mod(const Vector &v, const Vector &c)
 {
+   float x = v.xv();
+   float y = v.yv();
+   float z = v.zv();
+   float cx = c.xv();
+   float cy = c.yv();
+   float cz = c.zv();
+
+   while((x + cx) < cx)
+      x += cx;
+   while((y + cy) < cy)
+      y += cy;
+   while((z + cz) < cz)
+      z += cz;
+
+   while((x - cx) >= cx)
+      x -= cx;
+   while((y - cy) >= cy)
+      y -= cy;
+   while((z - cz) >= cz)
+      z -= cz;
+
+   return Vector(x, y , z);
+#if 0
    static const __m128i SIGNMASK = _mm_set1_epi32(0x80000000);
 
    __m128 div = v.v / c.v;
@@ -354,4 +377,39 @@ Vector Vector::Mod(const Vector &v, const Vector &c)
    __m128 signmod = _mm_or_ps(absmod, origsigns);
 
    return Vector(signmod);
+#endif
+}
+
+Vector Vector::Floor() const
+{
+#ifdef __SSE4_1__
+   __m128 f = _mm_round_ps(v, _MM_FROUND_TO_ZERO);
+#else
+   static const __m128i SIGNMASK = _mm_set1_epi32(0x80000000);
+   __m128i ints = _mm_cvttps_epi32(v);
+   __m128 truncs = _mm_cvtepi32_ps(ints);
+
+   __m128 flags = _mm_castsi128_ps(_mm_cmpeq_epi32(ints, SIGNMASK));
+   __m128 res1 = _mm_and_ps(flags, v);
+   __m128 res2 = _mm_andnot_ps(flags, truncs);
+   __m128 f = _mm_or_ps(res1, res2);
+#endif
+   return Vector(f);
+}
+
+Vector Vector::Floor(const Vector &v)
+{
+#ifdef __SSE4_1__
+   __m128 f = _mm_round_ps(v.v, _MM_FROUND_TO_ZERO);
+#else
+   static const __m128i SIGNMASK = _mm_set1_epi32(0x80000000);
+   __m128i ints = _mm_cvttps_epi32(v.v);
+   __m128 truncs = _mm_cvtepi32_ps(ints);
+
+   __m128 flags = _mm_castsi128_ps(_mm_cmpeq_epi32(ints, SIGNMASK));
+   __m128 res1 = _mm_and_ps(flags, v.v);
+   __m128 res2 = _mm_andnot_ps(flags, truncs);
+   __m128 f = _mm_or_ps(res1, res2);
+#endif
+   return Vector(f);
 }

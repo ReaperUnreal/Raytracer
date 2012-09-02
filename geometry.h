@@ -196,7 +196,9 @@ class SDF : public Geometry
 		Vector rotateX(const Vector &p, float theta) const;
 		Vector rotateY(const Vector &p, float theta) const;
 		Vector rotateZ(const Vector &p, float theta) const;
-		Vector repeat(const Vector &p, const Vector &c) const;
+		Vector repeatX(const Vector &p, float space) const;
+		Vector repeatY(const Vector &p, float space) const;
+		Vector repeatZ(const Vector &p, float space) const;
 
 		float sphere(const Vector &p, float r) const;
 		float box(const Vector &p, const Vector &b) const;

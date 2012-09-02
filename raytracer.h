@@ -10,7 +10,7 @@ enum
 	HIT = 1
 };
 
-const int TRACEDEPTH = 6;
+const int TRACEDEPTH = 16;
 const float MAXDEPTH = 100000.0f;
 
 class Raytracer
