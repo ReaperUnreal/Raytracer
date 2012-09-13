@@ -70,6 +70,9 @@ class Geometry
 		void SetLightIntensity(float i);
 		float GetLightIntensity(void);
 
+      Geometry* GetLightCacheItem(int thread);
+      void SetLightCacheItem(Geometry *geom, int thread);
+
 		virtual int GetType(void) const = 0;
 		virtual int Intersect(Ray &r, float &mindist) const = 0;
 		virtual Vector GetNormal(Vector &pos) const = 0;
@@ -79,6 +82,7 @@ class Geometry
 		std::string name;
 		bool isLight;
 		float lightIntensity;
+      std::vector<Geometry *> lightCache;
 };
 
 //the Plane class

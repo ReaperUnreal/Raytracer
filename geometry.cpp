@@ -92,6 +92,9 @@ float Material::GetIOR(void) const
 //the Geometry class
 Geometry::Geometry(void) : mat(), name("Unknown"), isLight(false), lightIntensity(1.0f)
 {
+   //since the light cache can be accessed from any thread, it needs to be large enough
+   //for the maximum number of threads
+   lightCache.resize(omp_get_max_threads(), NULL);
 }
 
 Geometry::~Geometry(void)
@@ -116,6 +119,16 @@ void Geometry::SetLightIntensity(float i)
 float Geometry::GetLightIntensity(void)
 {
 	return lightIntensity;
+}
+
+Geometry* Geometry::GetLightCacheItem(int thread)
+{
+   return lightCache[thread];
+}
+
+void Geometry::SetLightCacheItem(Geometry *geom, int thread)
+{
+   lightCache[thread] = geom;
 }
 
 void Geometry::SetMaterial(const Material &m)

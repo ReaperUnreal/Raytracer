@@ -201,18 +201,33 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 				//shadow
 				if(shadowQuality == 1)
 				{
+               Geometry *lcache = (*lit)->GetLightCacheItem(omp_get_thread_num());
 					shade = 1.0f;
 
 					shadow.direction = L;
-					vector<Geometry *> &sov = sc->GetObjects();
-					for(vector<Geometry *>::iterator sit = sov.begin(); sit != sov.end(); sit++)
-					{
-						if((*sit != *lit) && ((*sit)->Intersect(shadow, ldist)))
-						{
-							shade = 0.0f;
-							break;
-						}
-					}
+               
+               //try shadow cache first
+               bool lightCacheHit = false;
+               if(lcache && (lcache->Intersect(shadow, ldist)))
+               {
+                  lightCacheHit = true;
+                  shade = 0.0f;
+               }
+
+               //now iterate through the geometry
+               if(!lightCacheHit)
+               {
+                  vector<Geometry *> &sov = sc->GetObjects();
+                  for(vector<Geometry *>::iterator sit = sov.begin(); sit != sov.end(); sit++)
+                  {
+                     if((*sit != *lit) && (*sit != lcache) && ((*sit)->Intersect(shadow, ldist)))
+                     {
+                        (*lit)->SetLightCacheItem(*sit, omp_get_thread_num());
+                        shade = 0.0f;
+                        break;
+                     }
+                  }
+               }
 				}
 				else
 				{
@@ -222,19 +237,36 @@ Geometry* Raytracer::Raytrace(Ray &r, Color &col, int depth, float &dist)
 					//#pragma omp parallel for default(none) shared(light, intersection, ldist, numItems, step) private(i, inShade, tempdist, shadowObj, s) firstprivate(shadow) reduction(+:shade) schedule(dynamic, 1)
 					for(i = 0; i < shadowQuality; i++)
 					{
+                  Geometry *lcache = (*lit)->GetLightCacheItem(omp_get_thread_num());
 						shadow.direction = (*lit)->GeneratePoint() - intersection;
 						shadow.direction.Normalize();
 						inShade = false;
 						tempdist = ldist;
-						vector<Geometry *> &sov = sc->GetObjects();
-						for(vector<Geometry *>::iterator sit = sov.begin(); sit != sov.end(); sit++)
-						{
-							if((*sit != *lit) && ((*sit)->Intersect(shadow, tempdist)))
-							{
-								inShade = true;
-								break;
-							}
-						}
+
+                  //try shadow cache first
+                  bool lightCacheHit = false;
+                  if(lcache && (lcache->Intersect(shadow, tempdist)))
+                  {
+                     lightCacheHit = true;
+                     shade = 0.0f;
+                  }
+
+                  //now iterate through the geometry
+                  if(!lightCacheHit)
+                  {
+                     vector<Geometry *> &sov = sc->GetObjects();
+                     for(vector<Geometry *>::iterator sit = sov.begin(); sit != sov.end(); sit++)
+                     {
+                        if((*sit != *lit) && (*sit != lcache) && ((*sit)->Intersect(shadow, tempdist)))
+                        {
+                           (*lit)->SetLightCacheItem(*sit, omp_get_thread_num());
+                           inShade = true;
+                           break;
+                        }
+                     }
+                  }
+
+                  //update the shading
 						if(!inShade)
 						{
 							shade += step;
