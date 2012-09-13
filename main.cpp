@@ -65,6 +65,24 @@ void setupScene()
 	ball->GetMaterial().SetReflectivity(1.0f);
 	scene->AddObject(ball);
 
+   Sphere *r = new Sphere(Vector(-2.0f, -1.5f, 2.0f), 0.5f);
+   r->GetMaterial().SetColor(Color::red);
+   r->GetMaterial().SetDiffuse(1.0f);
+   r->GetMaterial().SetSpecular(1.0f);
+   scene->AddObject(r);
+
+   Sphere *g = new Sphere(Vector(0.0f, -1.5f, 2.0f), 0.5f);
+   g->GetMaterial().SetColor(Color::green);
+   g->GetMaterial().SetDiffuse(1.0f);
+   g->GetMaterial().SetSpecular(1.0f);
+   scene->AddObject(g);
+
+   Sphere *b = new Sphere(Vector(2.0f, -1.5f, 2.0f), 0.5f);
+   b->GetMaterial().SetColor(Color::blue);
+   b->GetMaterial().SetDiffuse(1.0f);
+   b->GetMaterial().SetSpecular(1.0f);
+   scene->AddObject(b);
+
 	Plane *floor = new Plane(Vector(0.0f, 1.0f, 0.0f), 2.0f);
 	floor->GetMaterial().SetColor(Color::white);
 	floor->GetMaterial().SetDiffuse(1.0f);
@@ -73,8 +91,8 @@ void setupScene()
 	raytracer->SetScene(scene);
 
 	//unthinkable without multithreading
-	raytracer->SetShadowQuality(1);
-	raytracer->SetMultisampling(1);
+	raytracer->SetShadowQuality(32);
+	raytracer->SetMultisampling(32);
 	raytracer->SetReflectionBlur(1);
 	raytracer->SetOcclusion(0);
 }

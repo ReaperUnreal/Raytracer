@@ -32,8 +32,8 @@
 
 using namespace std;
 
-const int SCREEN_WIDTH = 320;
-const int SCREEN_HEIGHT = 240;
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
 const float PI = 3.14159265358979323846264338327950288419716939937511f; //lol, 50 digits!
 const float TWOPI = PI * 2.0f;
 const float PIBYTWO = PI * 0.5f;
