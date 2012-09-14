@@ -1,0 +1,50 @@
+Setup...
+Begin Render
+Render Complete, Time Taken: 106268 ms
+Writing Image
+Cleanup
+Setup...
+Begin Render
+Render Complete, Time Taken: 91162 ms
+Writing Image
+Cleanup
+Setup...
+Begin Render
+Render Complete, Time Taken: 91074 ms
+Writing Image
+Cleanup
+Setup...
+Begin Render
+Render Complete, Time Taken: 91628 ms
+Writing Image
+Cleanup
+Setup...
+Begin Render
+Render Complete, Time Taken: 91309 ms
+Writing Image
+Cleanup
+Setup...
+Begin Render
+Render Complete, Time Taken: 88593 ms
+Writing Image
+Cleanup
+Setup...
+Begin Render
+Render Complete, Time Taken: 91346 ms
+Writing Image
+Cleanup
+Setup...
+Begin Render
+Render Complete, Time Taken: 88843 ms
+Writing Image
+Cleanup
+Setup...
+Begin Render
+Render Complete, Time Taken: 88102 ms
+Writing Image
+Cleanup
+Setup...
+Begin Render
+Render Complete, Time Taken: 91441 ms
+Writing Image
+Cleanup
