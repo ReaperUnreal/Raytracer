@@ -245,29 +245,18 @@ class BVH : public Geometry
 
 		int IntersectRecursive(Ray &r, float &mindist, Geometry **obj) const;
 
-		void AddObject(Geometry *obj, Sphere *bounds);
-		void CalculateTree();
-
 	private:
 		class TreeNode
 		{
 			public:
-				void CalcBounds();
-				bool HasChildren();
-
 				vector<TreeNode *> children;
-				vector<Geometry *> members;
-				vector<Sphere *> memberBounds;
-				Sphere *bounds;
+            Geometry *object;
+            Geometry *bounds;
 		};
 
-		void SplitNode(TreeNode *node);
 		int Recurse(TreeNode *node, Ray &r, float &mindist, Geometry **obj) const;
 
-		vector<Geometry *> objects;
-		vector<Sphere *> objectBounds;
 		int branchiness;
-		int numObjects;
 		TreeNode *root;
 };
 
