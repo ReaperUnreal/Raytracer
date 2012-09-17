@@ -1077,7 +1077,7 @@ Vector BVH::GeneratePoint() const
 int BVH::Recurse(TreeNode *node, Ray &r, float &mindist, Geometry **obj) const
 {
    //base case
-   int newdist = mindist;
+   float newdist = mindist;
    if(node->bounds->Intersect(r, newdist) == MISS)
       return MISS;
 
@@ -1085,21 +1085,21 @@ int BVH::Recurse(TreeNode *node, Ray &r, float &mindist, Geometry **obj) const
    int numChildren = node->children.size();
    for(int i = 0; i < numChildren; i++)
    {
-      float newdist = mindist;
-      int res = Recurse(node->children[i], r, mindist, obj);
+      newdist = mindist;
+      int res = Recurse(node->children[i], r, newdist, obj);
       if(res != MISS)
          return res;
    }
 
    //if we didn't hit any of the children, that means we're a leaf node, or we're done
    //so check the object at this node
-   if(object)
+   if(node->object)
    {
-      int res = object->Intersect(r, mindist);
+      int res = node->object->Intersect(r, mindist);
       if(res != MISS)
       {
          //hit some actual geometry, so record it
-         *geom = object;
+         *obj = node->object;
       }
       return res;
    }
