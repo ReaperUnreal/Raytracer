@@ -49,3 +49,12 @@ int Scene::GetNumObjects(void) const
 {
 	return numObjects;
 }
+
+//preprocessing
+void Scene::Preprocess()
+{
+   for(int i = 0; i < numObjects; ++i)
+   {
+      objects[i]->Preprocess();
+   }
+}

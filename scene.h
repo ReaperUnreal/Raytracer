@@ -15,6 +15,8 @@ public:
 	Geometry* GetObjectAt(int index);
    vector<Geometry *>& GetObjects();
 	int GetNumObjects() const;
+
+   void Preprocess();
 private:
 	int numObjects;
    vector<Geometry *> objects;

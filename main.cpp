@@ -95,6 +95,9 @@ void setupScene()
 	raytracer->SetMultisampling(8);
 	raytracer->SetReflectionBlur(1);
 	raytracer->SetOcclusion(0);
+
+   //now that everything is ready to go, preprocess!
+   scene->Preprocess();
 }
 
 void cleanupScene()

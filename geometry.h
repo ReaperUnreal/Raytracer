@@ -73,16 +73,20 @@ class Geometry
       Geometry* GetLightCacheItem(int thread);
       void SetLightCacheItem(Geometry *geom, int thread);
 
+      Geometry* GetBounds();
+
 		virtual int GetType(void) const = 0;
 		virtual int Intersect(Ray &r, float &mindist) const = 0;
 		virtual Vector GetNormal(Vector &pos) const = 0;
 		virtual Vector GeneratePoint() const = 0;
-	private:
+      virtual void Preprocess();
+	protected:
 		Material mat;
 		std::string name;
 		bool isLight;
 		float lightIntensity;
       std::vector<Geometry *> lightCache;
+      Geometry *bounding;
 };
 
 //the Plane class
@@ -102,6 +106,7 @@ class Plane : public Geometry
 
 		int Intersect(Ray &r, float &mindist) const;
 		Vector GeneratePoint() const;
+      void Preprocess();
 	private:
 		Vector normal;
 		float d;
@@ -127,6 +132,7 @@ class Sphere : public Geometry
 		int GetType(void) const;
 		Vector GeneratePoint() const;
 		int GetIntersectionPoints(Ray &r, float &d1, float &d2) const;
+      void Preprocess();
 	private:
 		Vector position;
 		float radius, sqrRadius, invRadius;
@@ -146,6 +152,7 @@ class AABox : public Geometry
 		int Intersect(Ray &r, float &mindist) const;
 		int GetType() const;
 		Vector GeneratePoint() const;
+      void Preprocess();
 	private:
 		Vector bounds[2];
 };

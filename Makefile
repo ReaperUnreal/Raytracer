@@ -10,6 +10,10 @@ ifdef DISABLE_JITTER
    CFLAGS+=-DDISABLE_JITTER
 endif
 
+ifdef SPHERE_BVH
+   CFLAGS+=-DSPHERE_BVH
+endif
+
 ifndef DISABLE_SSE
 	SSE_FLAGS += -mssse3 -mfpmath=sse -DSSE2_ENABLE
 	SSE_FILES = color_sse.o vector_sse.o

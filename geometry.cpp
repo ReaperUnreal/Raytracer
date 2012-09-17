@@ -90,7 +90,7 @@ float Material::GetIOR(void) const
 }
 
 //the Geometry class
-Geometry::Geometry(void) : mat(), name("Unknown"), isLight(false), lightIntensity(1.0f)
+Geometry::Geometry(void) : mat(), name("Unknown"), isLight(false), lightIntensity(1.0f), bounding(NULL)
 {
    //since the light cache can be accessed from any thread, it needs to be large enough
    //for the maximum number of threads
@@ -99,6 +99,11 @@ Geometry::Geometry(void) : mat(), name("Unknown"), isLight(false), lightIntensit
 
 Geometry::~Geometry(void)
 {
+   if(bounding)
+   {
+      delete bounding;
+      bounding = NULL;
+   }
 }
 
 void Geometry::SetLight(bool l)
@@ -149,6 +154,15 @@ void Geometry::SetName(std::string nm)
 std::string Geometry::GetName(void) const
 {
 	return name;
+}
+
+void Geometry::Preprocess()
+{
+}
+
+Geometry* Geometry::GetBounds()
+{
+   return bounding;
 }
 
 //the Plane class
@@ -214,6 +228,27 @@ Vector Plane::GeneratePoint() const
 	float y = ((20.0f * lrflti(rand())) * MAX_RAND_DIVIDER) - 10.0f;
 	float z = -((normal.xv() * x + normal.yv() * y + d) / normal.zv());
 	return Vector(x, y, z);
+}
+
+void Plane::Preprocess()
+{
+#ifdef SPHERE_BVH
+   bounding = new Sphere(Vector(0.0f, 0.0f, 0.0f), 100000.0f);
+#else
+   //floor case is worth considering
+   if(fabsf(fabsf(normal.Dot(Vector(1.0f, 0.0f, 0.0f))) - 1.0f) < EPSILON)
+   {
+      Vector min(-50000.0f, -EPSILON, 50000.0f);
+      Vector max(50000.0f, EPSILON, 50000.0f);
+      bounding = new AABox(min, max);
+   }
+   else
+   {
+      Vector min(-50000.0f, -50000.0f, 50000.0f);
+      Vector max(50000.0f, 50000.0f, 50000.0f);
+      bounding = new AABox(min, max);
+   }
+#endif
 }
 
 //the Sphere class
@@ -389,6 +424,16 @@ int Sphere::GetIntersectionPoints(Ray &r, float &d1, float &d2) const
 	return MISS;
 }
 
+void Sphere::Preprocess()
+{
+#ifdef SPHERE_BVH
+   bounding = new Sphere(position, radius);
+#else
+   Vector r(radius, radius, radius);
+   bounding = new AABox(position - r, position + r);
+#endif
+}
+
 //the Axis Aligned Box class
 AABox::AABox(const Vector &min, const Vector &max)
 {
@@ -533,6 +578,17 @@ Vector AABox::GeneratePoint() const
    res += bounds[0];
 
    return res;
+}
+
+void AABox::Preprocess()
+{
+#ifdef SPHERE_BVH
+   Vector pos = (bounds[0] + bounds[1]) * 0.5f;
+   float r = (bounds[1] - bounds[0]).Length() * 0.5f;
+   bounding = new Sphere(pos, r);
+#else
+   bounding = new AABox(bounds[0], bounds[1]);
+#endif
 }
 
 //the Metaball class
