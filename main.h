@@ -125,6 +125,7 @@ typedef union ivu
 #include "ray.h"
 #include "camera.h"
 #include "geometry.h"
+#include "bvh.h"
 #include "scene.h"
 #include "progress.h"
 #include "raytracer.h"

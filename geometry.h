@@ -133,6 +133,7 @@ class Sphere : public Geometry
 		Vector GeneratePoint() const;
 		int GetIntersectionPoints(Ray &r, float &d1, float &d2) const;
       void Preprocess();
+      void Union(const Sphere &s);
 	private:
 		Vector position;
 		float radius, sqrRadius, invRadius;
@@ -153,6 +154,7 @@ class AABox : public Geometry
 		int GetType() const;
 		Vector GeneratePoint() const;
       void Preprocess();
+      void Union(const AABox &b);
 	private:
 		Vector bounds[2];
 };
@@ -229,35 +231,6 @@ class SDF : public Geometry
 	private:
 		float threshold;
 		int iterations;
-};
-
-//BVH for speed
-class BVH : public Geometry
-{
-	public:
-		BVH(int childrenPerLevel = 4);
-		virtual ~BVH();
-
-		Vector GetNormal(Vector &pos) const;
-		int Intersect(Ray &r, float &mindist) const;
-		int GetType(void) const;
-		Vector GeneratePoint() const;
-
-		int IntersectRecursive(Ray &r, float &mindist, Geometry **obj) const;
-
-	private:
-		class TreeNode
-		{
-			public:
-				vector<TreeNode *> children;
-            Geometry *object;
-            Geometry *bounds;
-		};
-
-		int Recurse(TreeNode *node, Ray &r, float &mindist, Geometry **obj) const;
-
-		int branchiness;
-		TreeNode *root;
 };
 
 #endif

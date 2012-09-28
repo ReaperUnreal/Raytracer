@@ -434,6 +434,34 @@ void Sphere::Preprocess()
 #endif
 }
 
+void Sphere::Union(const Sphere &s)
+{
+   // algorithm from here: http://answers.google.com/answers/threadview/id/342125.html
+   Vector diff = s.position - position;
+   float dlen = diff.Length();
+   if(dlen < EPSILON)
+   {
+      radius = fmax(radius, s.radius);
+   }
+   else if(radius > dlen + s.radius)
+   {
+      //nothing to do, other sphere is entirely contained
+   }
+   else if(s.radius > dlen + radius)
+   {
+      //other sphere contains this one exactly
+      radius = s.radius;
+      position = s.position;
+   }
+   else
+   {
+      float newradius = (dlen + radius + s.radius) * 0.5f;
+      Vector newpos = position + diff * (0.5f * (s.radius + dlen - radius) / dlen); 
+      radius = newradius;
+      position = newpos;
+   }
+}
+
 //the Axis Aligned Box class
 AABox::AABox(const Vector &min, const Vector &max)
 {
@@ -589,6 +617,13 @@ void AABox::Preprocess()
 #else
    bounding = new AABox(bounds[0], bounds[1]);
 #endif
+}
+
+void AABox::Union(const AABox &b)
+{
+   //easy enough
+   bounds[0] = Vector::Min(bounds[0], b.bounds[0]);
+   bounds[1] = Vector::Max(bounds[1], b.bounds[1]);
 }
 
 //the Metaball class
@@ -1038,81 +1073,4 @@ Vector SDF::repeatZ(const Vector &p, float space) const
    z = fmod(z, space) - (0.5f * space);
    Vector q(x, y, z);
    return q;
-}
-
-//the Bounding Volume Heirarchy class
-BVH::BVH(int childrenPerLevel) : branchiness(childrenPerLevel), root(NULL)
-{
-}
-
-BVH::~BVH()
-{
-	//tear down tree most likely
-}
-
-int BVH::GetType() const
-{
-	return BVHACCEL;
-}
-
-Vector BVH::GetNormal(Vector &pos) const
-{
-	// should never use this
-	return Vector();
-}
-
-int BVH::Intersect(Ray &r, float &mindist) const
-{
-	// similar to IntersectRecursive but I only care IF we hit, not WHAT we hit
-	Geometry *geom = NULL;
-	return IntersectRecursive(r, mindist, &geom);
-}
-
-Vector BVH::GeneratePoint() const
-{
-	// should never use this
-	return MISS;
-}
-
-int BVH::Recurse(TreeNode *node, Ray &r, float &mindist, Geometry **obj) const
-{
-   //base case
-   float newdist = mindist;
-   if(node->bounds->Intersect(r, newdist) == MISS)
-      return MISS;
-
-   //recursive case
-   int numChildren = node->children.size();
-   for(int i = 0; i < numChildren; i++)
-   {
-      newdist = mindist;
-      int res = Recurse(node->children[i], r, newdist, obj);
-      if(res != MISS)
-         return res;
-   }
-
-   //if we didn't hit any of the children, that means we're a leaf node, or we're done
-   //so check the object at this node
-   if(node->object)
-   {
-      int res = node->object->Intersect(r, mindist);
-      if(res != MISS)
-      {
-         //hit some actual geometry, so record it
-         *obj = node->object;
-      }
-      return res;
-   }
-
-   //done, nothing hit
-   return MISS;
-}
-
-int BVH::IntersectRecursive(Ray &r, float &mindist, Geometry **obj) const
-{
-	//the main BVH method
-	//traverse the heirarchy and find the right object
-   int rc = Recurse(root, r, mindist, obj);
-
-   return rc;
 }
